@@ -19,33 +19,49 @@ Este projeto cria uma infraestrutura de 3 camadas (Web, App, Data) com os seguin
 
 ## Arquitetura
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│  RESOURCE GROUP (rg-{projeto}-{ambiente})                                   │
-│                                                                             │
-│  ┌─────────────────┐     ┌────────────────────────────────────────────────┐ │
-│  │                 │     │  VIRTUAL NETWORK (10.0.0.0/16)                 │ │
-│  │   KEY VAULT     │     │                                                │ │
-│  │                 │     │  ┌──────────────────────────────────────────┐  │ │
-│  │  ┌───────────┐  │     │  │  SUBNET WEB (10.0.1.0/24)                │  │ │
-│  │  │ Segredos  │──┼────▶│  │  ┌────────────────────────────────────┐  │  │ │
-│  │  │ (senhas)  │  │     │  │  │  VM + Docker         [NSG: 80,443] │  │  │ │
-│  │  └───────────┘  │     │  │  └────────────────────────────────────┘  │  │ │
-│  └─────────────────┘     │  └──────────────────────────────────────────┘  │ │
-│                          │                                                │ │
-│  ┌─────────────────┐     │  ┌──────────────────────────────────────────┐  │ │
-│  │                 │     │  │  SUBNET APP (10.0.2.0/24)                │  │ │
-│  │ STORAGE ACCOUNT │     │  │  ┌────────────────────────────────────┐  │  │ │
-│  │                 │     │  │  │  VM + Docker      [NSG: 8080,8443] │  │  │ │
-│  │  ├─ data       │◀────┼──│  └────────────────────────────────────┘  │  │ │
-│  │  ├─ logs       │     │  └──────────────────────────────────────────┘  │ │
-│  │  └─ backups    │     │                                                │ │
-│  └─────────────────┘     │  ┌──────────────────────────────────────────┐  │ │
-│                          │  │  SUBNET DATA (10.0.3.0/24)               │  │ │
-│                          │  │  [NSG: 1433,3306,5432 - apenas interno]  │  │ │
-│                          │  └──────────────────────────────────────────┘  │ │
-│                          └────────────────────────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph RG["🗂️ Resource Group (rg-{projeto}-{ambiente})"]
+        direction TB
+
+        subgraph SERVICES[" "]
+            direction TB
+            KV["🔐 Key Vault<br/>Segredos (senhas)"]
+            SA["📦 Storage Account<br/>├─ data<br/>├─ logs<br/>└─ backups"]
+        end
+
+        subgraph VNET["🌐 Virtual Network (10.0.0.0/16)"]
+            direction TB
+
+            subgraph WEB["Subnet Web (10.0.1.0/24)"]
+                VM_WEB["🖥️ VM + Docker"]
+                NSG_WEB["🛡️ NSG: 80, 443, 22"]
+            end
+
+            subgraph APP["Subnet App (10.0.2.0/24)"]
+                VM_APP["🖥️ VM + Docker"]
+                NSG_APP["🛡️ NSG: 8080, 8443, 22"]
+            end
+
+            subgraph DATA["Subnet Data (10.0.3.0/24)"]
+                NSG_DATA["🛡️ NSG: 1433, 3306, 5432<br/>(apenas interno)"]
+            end
+        end
+    end
+
+    KV -.->|senhas| VM_WEB
+    KV -.->|senhas| VM_APP
+    VM_WEB -->|"porta 8080"| VM_APP
+    VM_APP -->|"portas DB"| DATA
+    VM_APP -->|"logs/backups"| SA
+
+    style RG fill:#e8f4fd,stroke:#0078d4
+    style VNET fill:#f0f9e8,stroke:#107c10
+    style WEB fill:#fff4ce,stroke:#ffb900
+    style APP fill:#fce8e8,stroke:#d13438
+    style DATA fill:#e8e8f4,stroke:#5c2d91
+    style KV fill:#fff,stroke:#0078d4
+    style SA fill:#fff,stroke:#0078d4
 ```
 
 ## Estrutura do Projeto

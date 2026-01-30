@@ -19,50 +19,26 @@ Este projeto cria uma infraestrutura de 3 camadas (Web, App, Data) com os seguin
 
 ## Arquitetura
 
-```mermaid
-flowchart TB
-    subgraph RG["🗂️ Resource Group (rg-{projeto}-{ambiente})"]
-        direction TB
+A infraestrutura segue um modelo de **3 camadas** dentro de um Resource Group (`rg-{projeto}-{ambiente}`):
 
-        subgraph SERVICES[" "]
-            direction TB
-            KV["🔐 Key Vault<br/>Segredos (senhas)"]
-            SA["📦 Storage Account<br/>├─ data<br/>├─ logs<br/>└─ backups"]
-        end
+### Rede
 
-        subgraph VNET["🌐 Virtual Network (10.0.0.0/16)"]
-            direction TB
+- **Virtual Network** `10.0.0.0/16` com 3 subnets isoladas:
+  - **Web** (`10.0.1.0/24`) - VMs com Docker, NSG permite portas 80, 443, 22
+  - **App** (`10.0.2.0/24`) - VMs com Docker, NSG permite portas 8080, 8443, 22
+  - **Data** (`10.0.3.0/24`) - NSG permite apenas portas 1433, 3306, 5432 de origem interna
 
-            subgraph WEB["Subnet Web (10.0.1.0/24)"]
-                VM_WEB["🖥️ VM + Docker"]
-                NSG_WEB["🛡️ NSG: 80, 443, 22"]
-            end
+### Serviços
 
-            subgraph APP["Subnet App (10.0.2.0/24)"]
-                VM_APP["🖥️ VM + Docker"]
-                NSG_APP["🛡️ NSG: 8080, 8443, 22"]
-            end
+- **Key Vault** - Armazena segredos (senhas das VMs) com acesso restrito por subnet
+- **Storage Account** - 3 containers (data, logs, backups) com HTTPS obrigatório e TLS 1.2
 
-            subgraph DATA["Subnet Data (10.0.3.0/24)"]
-                NSG_DATA["🛡️ NSG: 1433, 3306, 5432<br/>(apenas interno)"]
-            end
-        end
-    end
+### Fluxo de Dados
 
-    KV -.->|senhas| VM_WEB
-    KV -.->|senhas| VM_APP
-    VM_WEB -->|"porta 8080"| VM_APP
-    VM_APP -->|"portas DB"| DATA
-    VM_APP -->|"logs/backups"| SA
-
-    style RG fill:#e8f4fd,stroke:#0078d4
-    style VNET fill:#f0f9e8,stroke:#107c10
-    style WEB fill:#fff4ce,stroke:#ffb900
-    style APP fill:#fce8e8,stroke:#d13438
-    style DATA fill:#e8e8f4,stroke:#5c2d91
-    style KV fill:#fff,stroke:#0078d4
-    style SA fill:#fff,stroke:#0078d4
-```
+1. Camada **Web** recebe requisições externas (HTTP/HTTPS)
+2. Camada **App** processa a lógica de negócio
+3. Camada **Data** armazena dados (acesso apenas da camada App)
+4. **Storage Account** recebe logs e backups da camada App
 
 ## Estrutura do Projeto
 

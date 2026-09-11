@@ -41,12 +41,18 @@ jobs:
         working-directory: environments/dev
 
       # Summaries work for fork PRs without granting write permissions.
+      - name: Cost controls (mock providers, no Azure)
+        id: tests
+        run: terraform test -no-color
+        working-directory: environments/dev
+
       - name: Validation summary
         if: always()
         env:
           FMT: ${{ steps.fmt.outcome }}
           INIT: ${{ steps.init.outcome }}
           VALIDATE: ${{ steps.validate.outcome }}
+          TESTS: ${{ steps.tests.outcome }}
         run: |
           {
             echo '### Terraform validation (no Azure access)'
@@ -55,6 +61,7 @@ jobs:
             echo "| Format | $FMT |"
             echo "| Init (backend disabled) | $INIT |"
             echo "| Validate | $VALIDATE |"
+            echo "| Cost controls (mocks) | $TESTS |"
           } >> "$GITHUB_STEP_SUMMARY"
 
   security:

@@ -21,8 +21,27 @@ variable "location" {
 }
 
 variable "vm_count" {
-  type    = number
-  default = 1
+  description = "Quantidade de VMs de teste: 0 desabilita compute; DEV permite no máximo 1."
+  type        = number
+  default     = 0
+  nullable    = false
+
+  validation {
+    condition     = contains([0, 1], var.vm_count)
+    error_message = "DEV aceita apenas vm_count = 0 ou 1."
+  }
+}
+
+variable "vm_size" {
+  description = "SKU candidato para testes; confirmar preço e disponibilidade antes da execução aprovada."
+  type        = string
+  default     = "Standard_B1s"
+  nullable    = false
+
+  validation {
+    condition     = contains(["Standard_B1s", "Standard_B2s"], var.vm_size)
+    error_message = "DEV permite apenas Standard_B1s ou Standard_B2s; outros SKUs exigem revisão da política em PR."
+  }
 }
 
 variable "owner" {
@@ -30,11 +49,21 @@ variable "owner" {
 }
 
 variable "storage_account_tier" {
-  type    = string
-  default = "Standard"
+  type     = string
+  default  = "Standard"
+  nullable = false
+  validation {
+    condition     = var.storage_account_tier == "Standard"
+    error_message = "DEV permite somente Storage Standard."
+  }
 }
 
 variable "storage_replication_type" {
-  type    = string
-  default = "LRS"
+  type     = string
+  default  = "LRS"
+  nullable = false
+  validation {
+    condition     = var.storage_replication_type == "LRS"
+    error_message = "DEV permite somente replicação LRS."
+  }
 }

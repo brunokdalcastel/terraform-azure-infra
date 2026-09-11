@@ -48,6 +48,7 @@ module "app_infrastructure" {
   environment  = var.environment
   location     = var.location
   vm_count     = var.vm_count
+  vm_size      = var.vm_size
   owner        = var.owner
 
   # Passando variáveis opcionais (se definidas) ou usando defaults do módulo

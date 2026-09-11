@@ -83,6 +83,7 @@ output "deployment_summary" {
     resource_group      = azurerm_resource_group.main.name
     vnet_address_space  = var.vnet_address_space
     vm_count            = var.vm_count
+    vm_size             = var.vm_size
     storage_replication = var.storage_replication_type
   }
 }

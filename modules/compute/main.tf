@@ -9,6 +9,7 @@
 # ==============================================================================
 
 resource "random_password" "admin_password" {
+  count            = var.vm_count > 0 ? 1 : 0
   length           = 20
   special          = true
   override_special = "!@#$%&*()-_=+[]{}|"
@@ -23,8 +24,9 @@ resource "random_password" "admin_password" {
 # ==============================================================================
 
 resource "azurerm_key_vault_secret" "admin_password" {
+  count        = var.vm_count > 0 ? 1 : 0
   name         = "vm-admin-password"
-  value        = random_password.admin_password.result
+  value        = random_password.admin_password[0].result
   key_vault_id = var.key_vault_id
 
   tags = var.tags
@@ -63,7 +65,7 @@ resource "azurerm_linux_virtual_machine" "main" {
   tags                = var.tags
 
   admin_username                  = var.admin_username
-  admin_password                  = random_password.admin_password.result
+  admin_password                  = random_password.admin_password[0].result
   disable_password_authentication = false
 
   network_interface_ids = [

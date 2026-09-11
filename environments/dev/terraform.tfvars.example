@@ -18,8 +18,11 @@ environment = "dev"
 location = "brazilsouth"
 
 # Número de VMs a serem criadas
-# O default atual do módulo é Standard_D2s_v3; não há garantia de gratuidade
-vm_count = 1
+# Zero desabilita VMs, NICs e a senha/secret de compute, mas não os outros serviços
+vm_count = 0
+
+# Apenas B1s/B2s no DEV; confirmar disponibilidade e preço antes de habilitar 1 VM
+vm_size = "Standard_B1s"
 
 # Email do responsável pelo projeto
 owner = "seu-email@exemplo.com"

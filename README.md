@@ -14,7 +14,7 @@ Merge de código não autoriza deploy.
 | --- | --- | --- |
 | Estrutura | DEV e cinco módulos | PROD e state separado |
 | State | Backend local; state ignorado pelo Git | Bootstrap e Azure Blob com locking |
-| CI | fmt bloqueante, init sem backend, validate | TFLint e política de findings |
+| CI | fmt, init sem backend, validate e testes com mocks | TFLint e política de findings |
 | Segurança CI | Checkov report-only | Bloqueio de violações selecionadas |
 | Entrega | CI sem autenticação/deploy Azure | OIDC e execução manual aprovada |
 | Governança | Prefixo e tags centralizadas | Tags estáveis, ADRs e política de custos |
@@ -52,11 +52,15 @@ terraform fmt -check -recursive
 cd environments/dev
 terraform init -backend=false -lockfile=readonly -input=false
 terraform validate
+terraform test
 ```
 
 `init` instala dependências com o backend desabilitado. `validate` verifica a
 configuração, mas não comprova permissões, quota, disponibilidade regional,
 conectividade ou sucesso de um deploy.
+
+`terraform test` usa providers simulados e somente planos locais. Verifica os
+limites de custo sem consultar Azure ou criar recursos reais.
 
 O lock file do DEV fixa AzureRM **4.14.0** e Random **3.6.3**. A raiz do repositório
 não é um root module executável e não possui lock file. Os módulos declaram seus
@@ -74,12 +78,13 @@ futura execução aprovada. Não commitar tfvars reais, state, planos ou credenc
 | owner | Obrigatório |
 | environment | dev |
 | location | swedencentral; exemplo usa brazilsouth |
-| vm_count | 1 |
+| vm_count | 0; DEV aceita somente 0 ou 1 |
+| vm_size | Standard_B1s; DEV aceita B1s ou B2s |
 | storage_account_tier | Standard |
 | storage_replication_type | LRS |
 
-O orquestrador ainda define `vm_size = Standard_D2s_v3`, usuário `azureadmin`
-e VNet `10.0.0.0/16`. Esses inputs não estão expostos pelo DEV.
+O DEV expõe quantidade e SKU das VMs. O orquestrador ainda define usuário
+`azureadmin` e VNet `10.0.0.0/16`, que não estão expostos pelo DEV.
 Os outputs incluem Resource Group, VNet, subnets, Storage, Key Vault e IPs privados;
 só terão valores de infraestrutura após um deploy real.
 
@@ -103,10 +108,15 @@ Esses pontos serão tratados em mudanças próprias, com justificativa e valida�
 
 ## Custos e execução futura
 
-Não há garantia de Free Tier. O SKU atual **D2s_v3** precisa de revisão antes
-de qualquer provisionamento. VMs, discos, Storage, operações de Key Vault e tráfego
+Não há garantia de Free Tier. O default é **zero VMs**; habilitar uma VM exige
+escolha explícita e revisão de preço/disponibilidade do SKU B1s ou B2s.
+VMs, discos, Storage, operações de Key Vault e tráfego
 devem entrar na estimativa. Benefícios e disponibilidade dependem da assinatura
 e região. Nenhum recurso foi criado por esta etapa de preparação.
+
+Zero VMs não é custo zero: Storage e Key Vault permanecem no código. Veja
+[controle de custos](docs/cost-control.md), inclusive o impacto dos novos defaults
+em instalações existentes e as limitações dos testes simulados.
 
 A etapa final exigirá revisão de preços, quota, permissões, rede, backend e plano
 de remoção. Toda execução Azure dependerá de aprovação manual explícita.

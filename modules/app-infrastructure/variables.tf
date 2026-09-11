@@ -69,13 +69,18 @@ variable "subnets" {
 variable "vm_size" {
   description = "Tamanho das Virtual Machines"
   type        = string
-  default     = "Standard_D2s_v3" # Confirmar custo e disponibilidade antes do deploy
+  default     = "Standard_B1s" # Confirmar custo e disponibilidade antes do deploy
 }
 
 variable "vm_count" {
   description = "Número de VMs a serem criadas"
   type        = number
-  default     = 1
+  default     = 0
+  nullable    = false
+  validation {
+    condition     = var.vm_count >= 0 && floor(var.vm_count) == var.vm_count
+    error_message = "vm_count deve ser um inteiro não negativo."
+  }
 }
 
 variable "admin_username" {

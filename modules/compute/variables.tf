@@ -16,6 +16,11 @@ variable "name_prefix" {
 variable "vm_count" {
   description = "Número de VMs"
   type        = number
+  nullable    = false
+  validation {
+    condition     = var.vm_count >= 0 && floor(var.vm_count) == var.vm_count
+    error_message = "vm_count deve ser um inteiro não negativo."
+  }
 }
 
 variable "vm_size" {

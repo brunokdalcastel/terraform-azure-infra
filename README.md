@@ -1,311 +1,137 @@
 # Terraform Azure Infrastructure
 
-![Terraform](https://img.shields.io/badge/Terraform-≥1.5.0-purple?logo=terraform)
-![Azure](https://img.shields.io/badge/Azure-Free%20Tier%20Ready-blue?logo=microsoft-azure)
-![License](https://img.shields.io/badge/License-MIT-green)
+Portfólio de Infrastructure as Code para Azure, com módulos Terraform e evolução
+incremental por Pull Requests. O objetivo é demonstrar decisões de engenharia,
+validação reproduzível, segurança e controle de custos.
 
-Infraestrutura como Código (IaC) para provisionar uma arquitetura completa e segura na Azure, otimizada para **Free Tier**.
+**Status:** preparação e validação local. Provisionamento e testes reais no Azure
+ficam para a etapa final, após criação da conta e aprovação manual do proprietário.
+Merge de código não autoriza deploy.
 
-## Recursos Provisionados
+## Implementado e planejado
 
-Este projeto cria uma infraestrutura de 3 camadas (Web, App, Data) com os seguintes recursos:
+| Área | Implementado no código | Próxima evolução |
+| --- | --- | --- |
+| Estrutura | DEV e cinco módulos | PROD e state separado |
+| State | Backend local; state ignorado pelo Git | Bootstrap e Azure Blob com locking |
+| CI | fmt bloqueante, init sem backend, validate | TFLint e política de findings |
+| Segurança CI | Checkov report-only | Bloqueio de violações selecionadas |
+| Entrega | CI sem autenticação/deploy Azure | OIDC e execução manual aprovada |
+| Governança | Prefixo e tags centralizadas | Tags estáveis, ADRs e política de custos |
 
-| Categoria | Recursos |
-|-----------|----------|
-| **Rede** | Virtual Network, 3 Subnets, 3 Network Security Groups |
-| **Compute** | Virtual Machines Linux (Ubuntu 22.04) com Docker pré-instalado |
-| **Storage** | Storage Account com 3 containers (data, logs, backups) |
-| **Segurança** | Azure Key Vault para armazenamento de segredos |
+Veja [PROJECT_PLAN.md](PROJECT_PLAN.md) e as regras em [AGENTS.md](AGENTS.md).
 
-## Arquitetura
+## Arquitetura atual do código
 
-A infraestrutura segue um modelo de **3 camadas** dentro de um Resource Group (`rg-{projeto}-{ambiente}`):
-
-### Rede
-
-- **Virtual Network** `10.0.0.0/16` com 3 subnets isoladas:
-  - **Web** (`10.0.1.0/24`) - VMs com Docker, NSG permite portas 80, 443, 22
-  - **App** (`10.0.2.0/24`) - VMs com Docker, NSG permite portas 8080, 8443, 22
-  - **Data** (`10.0.3.0/24`) - NSG permite apenas portas 1433, 3306, 5432 de origem interna
-
-### Serviços
-
-- **Key Vault** - Armazena segredos (senhas das VMs) com acesso restrito por subnet
-- **Storage Account** - 3 containers (data, logs, backups) com HTTPS obrigatório e TLS 1.2
-
-### Fluxo de Dados
-
-1. Camada **Web** recebe requisições externas (HTTP/HTTPS)
-2. Camada **App** processa a lógica de negócio
-3. Camada **Data** armazena dados (acesso apenas da camada App)
-4. **Storage Account** recebe logs e backups da camada App
-
-## Estrutura do Projeto
-
-```
-terraform-azure-infra/
-│
-├── environments/                    # Configurações por ambiente
-│   └── dev/
-│       ├── main.tf                  # Configuração principal e providers
-│       ├── variables.tf             # Declaração de variáveis
-│       ├── outputs.tf               # Outputs do ambiente
-│       └── terraform.tfvars.example # Template de configuração
-│
-├── modules/                         # Módulos reutilizáveis
-│   ├── app-infrastructure/          # Módulo orquestrador
-│   │   ├── main.tf                  # Chama os outros módulos
-│   │   ├── variables.tf             # Variáveis de entrada
-│   │   └── outputs.tf               # Outputs consolidados
-│   │
-│   ├── network/                     # Recursos de rede
-│   │   ├── main.tf                  # VNet, Subnets, NSGs
-│   │   ├── variables.tf
-│   │   └── outputs.tf
-│   │
-│   ├── compute/                     # Máquinas virtuais
-│   │   ├── main.tf                  # VMs, NICs, scripts
-│   │   ├── variables.tf
-│   │   └── outputs.tf
-│   │
-│   ├── storage/                     # Armazenamento
-│   │   ├── main.tf                  # Storage Account, containers
-│   │   ├── variables.tf
-│   │   └── outputs.tf
-│   │
-│   └── security/                    # Segurança
-│       ├── main.tf                  # Key Vault
-│       ├── variables.tf
-│       └── outputs.tf
-│
-├── .github/workflows/               # CI/CD
-│   └── terraform.yml                # Pipeline de validação
-│
-├── .gitignore
-├── .editorconfig
-├── LICENSE
-├── CONTRIBUTING.md
-└── README.md
+```text
+environments/dev
+└── modules/app-infrastructure
+    ├── Resource Group
+    ├── network  → VNet, subnets Web/App/Data e NSGs
+    ├── security → Key Vault; depende da rede
+    ├── storage  → Storage Account e containers data/logs/backups
+    └── compute  → NICs e VMs na subnet App; depende da rede e Key Vault
 ```
 
-## Pré-requisitos
+As VMs usam Ubuntu 22.04 e um script que instala Docker. Não há IP público,
+aplicação Web, banco de dados, balanceador ou Bastion. Os containers são destinos
+potenciais; envio de logs/backups não está implementado. Três subnets não
+representam uma aplicação completa em três camadas já funcionando.
 
-| Ferramenta | Versão Mínima | Instalação |
-|------------|---------------|------------|
-| Terraform | 1.5.0+ | [Download](https://www.terraform.io/downloads) |
-| Azure CLI | 2.50.0+ | [Download](https://docs.microsoft.com/cli/azure/install-azure-cli) |
-| Git | 2.0+ | [Download](https://git-scm.com/downloads) |
+## Validação sem conta Azure
 
-**Conta Azure:** Você precisa de uma conta Azure com permissões de **Contributor** no nível de subscription.
-
-## Quick Start
-
-### 1. Clone o Repositório
+Pré-requisitos: Git, Terraform **1.14.3**, definido em
+[.terraform-version](.terraform-version), e internet para baixar providers.
+As constraints aceitam `>= 1.14.3, < 2.0.0`; outras versões não são automaticamente
+consideradas testadas. Não é necessário Azure CLI, login ou tfvars reais:
 
 ```bash
-git clone https://github.com/seu-usuario/terraform-azure-infra.git
+git clone https://github.com/brunokdalcastel/terraform-azure-infra.git
 cd terraform-azure-infra
-```
-
-### 2. Autentique na Azure
-
-```bash
-# Login interativo
-az login
-
-# Verifique a subscription ativa
-az account show
-
-# (Opcional) Mude para outra subscription
-az account set --subscription "SUBSCRIPTION_ID"
-```
-
-### 3. Configure as Variáveis
-
-```bash
+terraform fmt -check -recursive
 cd environments/dev
-
-# Copie o template
-cp terraform.tfvars.example terraform.tfvars
-
-# Edite com suas configurações
-# Mínimo necessário: project_name e owner
+terraform init -backend=false -lockfile=readonly -input=false
+terraform validate
 ```
 
-**Exemplo de `terraform.tfvars`:**
-```hcl
-project_name             = "meuapp"
-environment              = "dev"
-location                 = "brazilsouth"
-owner                    = "seu-email@exemplo.com"
-vm_count                 = 1
-storage_account_tier     = "Standard"
-storage_replication_type = "LRS"
-```
+`init` instala dependências com o backend desabilitado. `validate` verifica a
+configuração, mas não comprova permissões, quota, disponibilidade regional,
+conectividade ou sucesso de um deploy.
 
-### 4. Inicialize e Aplique
+O lock file do DEV fixa AzureRM **4.14.0** e Random **3.6.3**. A raiz do repositório
+não é um root module executável e não possui lock file. Os módulos declaram seus
+requisitos; o DEV controla a seleção efetiva.
 
-```bash
-# Inicializar (baixa providers e módulos)
-terraform init
+## Configuração DEV
 
-# Visualizar o que será criado
-terraform plan
+O [exemplo](environments/dev/terraform.tfvars.example) contém placeholders para a
+futura execução aprovada. Não commitar tfvars reais, state, planos ou credenciais.
 
-# Criar a infraestrutura
-terraform apply
-```
+| Input exposto pelo DEV | Obrigatório ou default |
+| --- | --- |
+| subscription_id | Obrigatório; placeholder no exemplo |
+| project_name | Obrigatório |
+| owner | Obrigatório |
+| environment | dev |
+| location | swedencentral; exemplo usa brazilsouth |
+| vm_count | 1 |
+| storage_account_tier | Standard |
+| storage_replication_type | LRS |
 
-### 5. Verifique os Outputs
+O orquestrador ainda define `vm_size = Standard_D2s_v3`, usuário `azureadmin`
+e VNet `10.0.0.0/16`. Esses inputs não estão expostos pelo DEV.
+Os outputs incluem Resource Group, VNet, subnets, Storage, Key Vault e IPs privados;
+só terão valores de infraestrutura após um deploy real.
 
-```bash
-# Ver todos os outputs
-terraform output
+## Limitações conhecidas
 
-# Ver IPs das VMs
-terraform output vm_private_ips
+- State local contém dados sensíveis, inclusive a senha das VMs. Guardar a senha
+  também no Key Vault não elimina sua presença no state.
+- Storage exige HTTPS/TLS 1.2 e containers privados, mas permite rede de qualquer
+  origem. Autenticação continua necessária.
+- Key Vault permite rede no DEV; em PROD o módulo configura Deny. O acesso do
+  futuro executor de deploy precisa ser resolvido antes dessa etapa.
+- Apenas o NSG Data tem bloqueio final explícito. Web/App ainda permitem tráfego
+  interno pela regra padrão da VNet. Há CIDRs fixos nas regras.
+- VMs usam senha e identidade gerenciada; permissões da identidade para serviços
+  não estão configuradas. O caminho de administração privada está pendente.
+- A tag CreatedAt usa timestamp() e pode gerar mudanças recorrentes no plan.
+- Checkov reporta findings sem bloquear. CI verde não significa ausência de
+  vulnerabilidades nem comprova funcionamento no Azure.
 
-# Ver URI do Key Vault
-terraform output key_vault_uri
-```
+Esses pontos serão tratados em mudanças próprias, com justificativa e validação.
 
-### 6. Destruir (quando não precisar mais)
+## Custos e execução futura
 
-```bash
-terraform destroy
-```
+Não há garantia de Free Tier. O SKU atual **D2s_v3** precisa de revisão antes
+de qualquer provisionamento. VMs, discos, Storage, operações de Key Vault e tráfego
+devem entrar na estimativa. Benefícios e disponibilidade dependem da assinatura
+e região. Nenhum recurso foi criado por esta etapa de preparação.
 
-## Variáveis
+A etapa final exigirá revisão de preços, quota, permissões, rede, backend e plano
+de remoção. Toda execução Azure dependerá de aprovação manual explícita.
 
-### Obrigatórias
+## Como explicar o projeto em entrevista
 
-| Variável | Descrição | Exemplo |
-|----------|-----------|---------|
-| `project_name` | Nome do projeto (usado em nomes de recursos) | `"meuapp"` |
-| `owner` | Email do responsável | `"admin@empresa.com"` |
+- **Módulos:** separar rede, compute, storage e segurança explicita dependências.
+- **Reprodutibilidade:** versão de referência, constraints e lock file reduzem
+  diferenças entre máquina local e CI.
+- **Pull Requests:** cada mudança tem objetivo, diff e evidências de validação.
+- **Tradeoffs:** backend local e regras permissivas são lacunas identificadas.
+  Remote state e OIDC só serão apresentados como concluídos após implementação
+  e testes correspondentes.
 
-### Opcionais
+## CI e contribuição
 
-| Variável | Descrição | Default |
-|----------|-----------|---------|
-| `environment` | Ambiente (dev, staging, prod) | `"dev"` |
-| `location` | Região Azure | `"westus2"` |
-| `vm_count` | Número de VMs | `1` |
-| `vm_size` | SKU da VM | `"Standard_B1s"` |
-| `admin_username` | Usuário admin das VMs | `"azureadmin"` |
-| `storage_account_tier` | Tier do storage | `"Standard"` |
-| `storage_replication_type` | Tipo de replicação | `"LRS"` |
-| `vnet_address_space` | CIDR da VNet | `["10.0.0.0/16"]` |
-| `common_tags` | Tags adicionais | `{}` |
+O [workflow](.github/workflows/terraform.yml) valida pushes em main/master e PRs.
+Usa token com leitura de conteúdo e publica resultados no resumo da execução,
+inclusive para forks. Não escreve comentários ou commits no repositório.
+terraform-docs roda após push na main, sem publicar automaticamente o resultado.
 
-## Outputs
-
-| Output | Descrição |
-|--------|-----------|
-| `resource_group_name` | Nome do Resource Group |
-| `vnet_id` | ID da Virtual Network |
-| `vnet_name` | Nome da Virtual Network |
-| `subnet_ids` | Map com IDs das subnets (web, app, data) |
-| `key_vault_id` | ID do Key Vault |
-| `key_vault_uri` | URI para acessar o Key Vault |
-| `storage_account_name` | Nome da Storage Account |
-| `storage_blob_endpoint` | Endpoint do Blob Storage |
-| `vm_ids` | Lista de IDs das VMs |
-| `vm_private_ips` | Lista de IPs privados das VMs |
-| `deployment_summary` | Resumo completo do deployment |
-
-## Segurança
-
-Este projeto implementa as seguintes práticas de segurança:
-
-| Prática | Implementação |
-|---------|---------------|
-| **Gestão de Segredos** | Senhas geradas automaticamente e armazenadas no Key Vault |
-| **Segmentação de Rede** | 3 subnets isoladas com NSGs específicos |
-| **Sem IP Público** | VMs acessíveis apenas via rede privada (usar Azure Bastion) |
-| **HTTPS Obrigatório** | Storage Account aceita apenas conexões HTTPS |
-| **TLS 1.2** | Versão mínima de TLS para Storage Account |
-| **Service Endpoints** | Restrição de acesso a Storage e Key Vault por subnet |
-
-### Regras de NSG por Camada
-
-| Subnet | Portas Permitidas | Origem |
-|--------|-------------------|--------|
-| Web | 80, 443, 22 | Internet (HTTP/S), VNet (SSH) |
-| App | 8080, 8443, 22 | Subnet Web, VNet (SSH) |
-| Data | 1433, 3306, 5432 | Subnet App apenas |
-
-
-## CI/CD
-
-O projeto inclui um workflow GitHub Actions (`.github/workflows/terraform.yml`) que executa:
-
-- **terraform fmt** - Verifica formatação do código
-- **terraform validate** - Valida sintaxe e configuração
-- **Checkov** - Análise de segurança da infraestrutura
-- **Comentários em PRs** - Feedback automático em Pull Requests
-
-## Ambientes
-
-O projeto suporta múltiplos ambientes. Cada ambiente pode ter configurações diferentes:
-
-| Ambiente | VM Size | VM Count | Storage | VNet CIDR |
-|----------|---------|----------|---------|-----------|
-| Dev | B1s | 1 | LRS | 10.0.0.0/16 |
-| Staging | B2ms | 2 | GRS | 10.1.0.0/16 |
-| Prod | D2s_v3 | 4 | ZRS | 10.2.0.0/16 |
-
-## Troubleshooting
-
-### Erro: "The subscription is not registered to use namespace 'Microsoft.X'"
-
-```bash
-az provider register --namespace Microsoft.Compute
-az provider register --namespace Microsoft.Network
-az provider register --namespace Microsoft.Storage
-az provider register --namespace Microsoft.KeyVault
-```
-
-### Erro: "Quota exceeded" ou "Not enough capacity"
-
-Mude a região no `terraform.tfvars`:
-```hcl
-location = "eastus2"  # ou outra região com capacidade
-```
-
-### Erro: "AuthorizationFailed"
-
-Verifique suas permissões:
-```bash
-az role assignment list --assignee $(az account show --query user.name -o tsv)
-```
-
-### Como acessar as VMs?
-
-As VMs não têm IP público por segurança. Use o Azure Bastion:
-```bash
-az network bastion ssh --name "bastion-name" --resource-group "rg-name" --target-resource-id "/subscriptions/.../virtualMachines/vm-name" --auth-type password --username azureadmin
-```
-
-### Como recuperar a senha da VM?
-
-```bash
-# A senha está no Key Vault
-az keyvault secret show --vault-name "kv-meuapp-xxxx" --name "vm-admin-password" --query value -o tsv
-```
-
-## Contribuindo
-
-Veja [CONTRIBUTING.md](CONTRIBUTING.md) para diretrizes de contribuição.
-
-## Licença
-
-Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
+Veja [CONTRIBUTING.md](CONTRIBUTING.md). Licença [MIT](LICENSE).
 
 ## Referências
 
-- [Azure Provider - Terraform Registry](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs)
-- [Terraform Best Practices](https://www.terraform-best-practices.com/)
-- [Azure Architecture Center](https://docs.microsoft.com/azure/architecture/)
-- [Azure Free Tier FAQ](https://azure.microsoft.com/free/free-account-faq/)
-- [Azure Naming Conventions](https://docs.microsoft.com/azure/cloud-adoption-framework/ready/azure-best-practices/resource-naming)
+- [Terraform: dados sensíveis](https://developer.hashicorp.com/terraform/language/manage-sensitive-data)
+- [Terraform: lock file](https://developer.hashicorp.com/terraform/language/files/dependency-lock)
+- [Azure: regras padrão de NSG](https://learn.microsoft.com/azure/virtual-network/network-security-groups-overview)

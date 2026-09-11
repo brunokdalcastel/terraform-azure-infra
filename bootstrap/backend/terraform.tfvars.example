@@ -1,0 +1,9 @@
+# Somente placeholders. Não executar no Azure antes da aprovação final.
+subscription_id      = "00000000-0000-0000-0000-000000000000"
+project_name         = "portfolio"
+location             = "swedencentral"
+owner                = "portfolio-owner"
+storage_account_name = "stportfolioexample001" # Escolher nome disponível na etapa final
+
+# Vazio bloqueia acesso aos dados. Preencher com os IPs de saída aprovados.
+allowed_ipv4_addresses = []

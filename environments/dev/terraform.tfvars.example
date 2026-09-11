@@ -6,24 +6,26 @@
 # ==============================================================================
 
 # Nome do projeto (usado em naming conventions)
+subscription_id = "00000000-0000-0000-0000-000000000000" # Placeholder; substituir só na etapa Azure aprovada
+
 project_name = "meulab"
 
 # Ambiente de deploy (dev, staging, prod)
 environment = "dev"
 
 # Região Azure para deploy dos recursos
-# Recomendadas para Free Tier: eastus, eastus2, westus2, brazilsouth
+# Confirmar disponibilidade e preço na assinatura antes do deploy aprovado
 location = "brazilsouth"
 
 # Número de VMs a serem criadas
-# Free Tier: 1 VM B1s gratuita por 12 meses
+# O default atual do módulo é Standard_D2s_v3; não há garantia de gratuidade
 vm_count = 1
 
 # Email do responsável pelo projeto
 owner = "seu-email@exemplo.com"
 
 # Tier da Storage Account (Standard ou Premium)
-# Free Tier: Standard (5GB gratuitos)
+# Custos dependem do consumo e das condições da assinatura
 storage_account_tier = "Standard"
 
 # Tipo de replicação da Storage Account

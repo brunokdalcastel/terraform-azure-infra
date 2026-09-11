@@ -21,7 +21,7 @@ variable "environment" {
 variable "location" {
   description = "Região Azure para deploy dos recursos"
   type        = string
-  default     = "westus2" # Região com boa capacidade para Free Tier
+  default     = "westus2"
 }
 
 variable "owner" {
@@ -69,13 +69,13 @@ variable "subnets" {
 variable "vm_size" {
   description = "Tamanho das Virtual Machines"
   type        = string
-  default     = "Standard_D2s_v3" # SKU disponível em swedencentral
+  default     = "Standard_D2s_v3" # Confirmar custo e disponibilidade antes do deploy
 }
 
 variable "vm_count" {
   description = "Número de VMs a serem criadas"
   type        = number
-  default     = 1 # 1 VM para Free Tier
+  default     = 1
 }
 
 variable "admin_username" {

@@ -5,6 +5,11 @@
 # State files (contêm dados sensíveis - NUNCA commitar)
 *.tfstate
 *.tfstate.*
+*.tfplan
+*.tfvars.json
+.env
+.env.*
+!.env.example
 .terraform/
 
 # O lock file DEVE ser commitado para garantir consistência de versões

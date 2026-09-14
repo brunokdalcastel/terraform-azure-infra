@@ -23,3 +23,7 @@ Use a versão em .terraform-version. Execute na raiz terraform fmt -check -recur
 em environments/dev use terraform init -backend=false -lockfile=readonly -input=false
 e terraform validate. Esses comandos não exigem conta Azure; init baixa providers.
 Preserve o lock file do root module. Reporte falhas e limitações sem marcar PASS indevidamente.
+
+O bootstrap/backend é um root module independente. Também validar com init
+-backend=false -lockfile=readonly, validate e terraform test. Os testes de ambos
+os roots usam mocks e somente command=plan; não substituir por providers reais.

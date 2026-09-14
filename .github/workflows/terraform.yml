@@ -11,8 +11,12 @@ permissions:
 
 jobs:
   validate:
-    name: Validate & Format
+    name: Validate (${{ matrix.root }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        root: [environments/dev, bootstrap/backend]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -30,22 +34,22 @@ jobs:
         id: fmt
         run: terraform fmt -check -recursive
 
-      - name: Terraform Init (Dev, no backend)
+      - name: Terraform Init (no backend)
         id: init
         run: terraform init -backend=false -lockfile=readonly -input=false
-        working-directory: environments/dev
+        working-directory: ${{ matrix.root }}
 
-      - name: Terraform Validate (Dev)
+      - name: Terraform Validate
         id: validate
         run: terraform validate -no-color
-        working-directory: environments/dev
+        working-directory: ${{ matrix.root }}
 
-      # Summaries work for fork PRs without granting write permissions.
-      - name: Cost controls (mock providers, no Azure)
+      - name: Tests (mock providers, no Azure)
         id: tests
         run: terraform test -no-color
-        working-directory: environments/dev
+        working-directory: ${{ matrix.root }}
 
+      # Summaries work for fork PRs without granting write permissions.
       - name: Validation summary
         if: always()
         env:
@@ -61,7 +65,7 @@ jobs:
             echo "| Format | $FMT |"
             echo "| Init (backend disabled) | $INIT |"
             echo "| Validate | $VALIDATE |"
-            echo "| Cost controls (mocks) | $TESTS |"
+            echo "| Tests (mocks) | $TESTS |"
           } >> "$GITHUB_STEP_SUMMARY"
 
   security:

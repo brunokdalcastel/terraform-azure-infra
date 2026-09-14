@@ -13,13 +13,17 @@ Merge de código não autoriza deploy.
 | Área | Implementado no código | Próxima evolução |
 | --- | --- | --- |
 | Estrutura | DEV e cinco módulos | PROD e state separado |
-| State | Backend local; state ignorado pelo Git | Bootstrap e Azure Blob com locking |
+| State | Backend local; bootstrap de Storage preparado e testado com mocks | Provisionar backend, migrar DEV e validar locking |
 | CI | fmt, init sem backend, validate e testes com mocks | TFLint e política de findings |
 | Segurança CI | Checkov report-only | Bloqueio de violações selecionadas |
 | Entrega | CI sem autenticação/deploy Azure | OIDC e execução manual aprovada |
 | Governança | Prefixo e tags centralizadas | Tags estáveis, ADRs e política de custos |
 
 Veja [PROJECT_PLAN.md](PROJECT_PLAN.md) e as regras em [AGENTS.md](AGENTS.md).
+
+O [bootstrap do backend](bootstrap/backend/README.md) é independente da aplicação.
+Seu código prepara o destino do state; nenhum Storage foi provisionado e o backend
+DEV continua local. A inicialização real exige revisão de rede e permissões.
 
 ## Arquitetura atual do código
 
@@ -65,6 +69,9 @@ limites de custo sem consultar Azure ou criar recursos reais.
 O lock file do DEV fixa AzureRM **4.14.0** e Random **3.6.3**. A raiz do repositório
 não é um root module executável e não possui lock file. Os módulos declaram seus
 requisitos; o DEV controla a seleção efetiva.
+
+O root module `bootstrap/backend` possui lock file próprio e os mesmos comandos
+de validação, executados separadamente. O CI testa os dois roots sem acesso Azure.
 
 ## Configuração DEV
 

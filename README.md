@@ -12,7 +12,7 @@ Merge de código não autoriza deploy.
 
 | Área | Implementado no código | Próxima evolução |
 | --- | --- | --- |
-| Estrutura | DEV e cinco módulos | PROD e state separado |
+| Estrutura | DEV/PROD com inputs e chaves de state próprias; cinco módulos | Validar ambientes reais e isolamento de permissões |
 | State | Bootstrap e backend AzureRM DEV preparados em código | Provisionar backend, migrar eventual state e validar locking |
 | CI | fmt, init sem backend, validate e testes com mocks | TFLint e política de findings |
 | Segurança CI | Checkov report-only | Bloqueio de violações selecionadas |
@@ -72,8 +72,9 @@ O lock file do DEV fixa AzureRM **4.14.0** e Random **3.6.3**. A raiz do reposit
 não é um root module executável e não possui lock file. Os módulos declaram seus
 requisitos; o DEV controla a seleção efetiva.
 
-O root module `bootstrap/backend` possui lock file próprio e os mesmos comandos
-de validação, executados separadamente. O CI testa os dois roots sem acesso Azure.
+Os roots `bootstrap/backend` e `environments/prod` possuem lock files próprios e os
+mesmos comandos de validação, executados separadamente. O CI testa os três roots
+sem acesso Azure. Veja os limites do [PROD demonstrativo](environments/prod/README.md).
 
 ## Configuração DEV
 

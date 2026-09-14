@@ -27,3 +27,6 @@ Preserve o lock file do root module. Reporte falhas e limitações sem marcar PA
 O bootstrap/backend é um root module independente. Também validar com init
 -backend=false -lockfile=readonly, validate e terraform test. Os testes de ambos
 os roots usam mocks e somente command=plan; não substituir por providers reais.
+
+environments/prod segue a mesma validação offline e possui lock file e chave de
+state próprios. Não inicializar seu backend remoto nesta etapa.

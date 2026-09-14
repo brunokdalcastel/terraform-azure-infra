@@ -55,14 +55,14 @@ module "network" {
 module "security" {
   source = "../security"
 
-  resource_group_name = azurerm_resource_group.main.name
-  location            = azurerm_resource_group.main.location
-  name_prefix         = local.name_prefix
-  environment         = var.environment
-  tenant_id           = data.azurerm_client_config.current.tenant_id
-  object_id           = data.azurerm_client_config.current.object_id
-  subnet_ids          = [module.network.subnet_ids["app"]]
-  tags                = local.common_tags
+  resource_group_name    = azurerm_resource_group.main.name
+  location               = azurerm_resource_group.main.location
+  name_prefix            = local.name_prefix
+  environment            = var.environment
+  tenant_id              = data.azurerm_client_config.current.tenant_id
+  allowed_ipv4_addresses = var.key_vault_allowed_ipv4_addresses
+  subnet_ids             = [module.network.subnet_ids["app"]]
+  tags                   = local.common_tags
 
   depends_on = [module.network]
 }

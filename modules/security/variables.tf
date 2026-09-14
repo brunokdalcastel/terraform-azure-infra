@@ -24,11 +24,6 @@ variable "tenant_id" {
   type        = string
 }
 
-variable "object_id" {
-  description = "Object ID do usuário/service principal atual"
-  type        = string
-}
-
 variable "subnet_ids" {
   description = "IDs das subnets permitidas"
   type        = list(string)
@@ -37,4 +32,15 @@ variable "subnet_ids" {
 variable "tags" {
   description = "Tags dos recursos"
   type        = map(string)
+}
+
+variable "allowed_ipv4_addresses" {
+  description = "IPv4 individuais aprovados para Key Vault; vazio por padrão."
+  type        = set(string)
+  default     = []
+  nullable    = false
+  validation {
+    condition     = alltrue([for address in var.allowed_ipv4_addresses : can(regex("^[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+$", address)) && can(cidrnetmask("${address}/32"))])
+    error_message = "Informe IPv4 individuais; não são aceitos CIDR ou IPv6."
+  }
 }

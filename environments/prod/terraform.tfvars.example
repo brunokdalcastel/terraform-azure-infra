@@ -1,0 +1,38 @@
+# ==============================================================================
+# EXEMPLO DE VARIÁVEIS - AMBIENTE PROD
+# ==============================================================================
+# Copie este arquivo para terraform.tfvars e ajuste os valores:
+#   cp terraform.tfvars.example terraform.tfvars
+# ==============================================================================
+
+# Nome do projeto (usado em naming conventions)
+subscription_id = "00000000-0000-0000-0000-000000000000" # Placeholder; substituir só na etapa Azure aprovada
+
+project_name = "meulab"
+
+# Ambiente de deploy (dev, staging, prod)
+environment = "prod"
+
+# Região Azure para deploy dos recursos
+# Confirmar disponibilidade e preço na assinatura antes do deploy aprovado
+location = "brazilsouth"
+
+# Número de VMs a serem criadas
+# Zero desabilita VMs, NICs e a senha/secret de compute, mas não os outros serviços
+vm_count = 0
+
+# Apenas B1s/B2s no PROD; confirmar disponibilidade e preço antes de habilitar 1 VM
+vm_size = "Standard_B1s"
+
+# Email do responsável pelo projeto
+owner = "seu-email@exemplo.com"
+
+# Tier da Storage Account (Standard ou Premium)
+# Custos dependem do consumo e das condições da assinatura
+storage_account_tier = "Standard"
+
+# Tipo de replicação da Storage Account
+# LRS = Locally Redundant (mais barato, ideal para dev)
+# GRS = Geo-Redundant (staging/prod)
+# ZRS = Zone-Redundant (alta disponibilidade)
+storage_replication_type = "LRS"

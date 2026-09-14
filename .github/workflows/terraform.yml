@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        root: [environments/dev, bootstrap/backend]
+        root: [environments/dev, environments/prod, bootstrap/backend]
     steps:
       - name: Checkout
         uses: actions/checkout@v4

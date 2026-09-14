@@ -1,0 +1,4 @@
+# Coordinates only; replace from bootstrap outputs after approved provisioning.
+# This example is not loaded automatically and must not contain credentials.
+resource_group_name  = "rg-portfolio-tfstate"
+storage_account_name = "stportfolioexample001"

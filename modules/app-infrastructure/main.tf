@@ -79,7 +79,8 @@ module "storage" {
   name_prefix              = local.name_prefix
   account_tier             = var.storage_account_tier
   account_replication_type = var.storage_replication_type
-  subnet_ids               = [module.network.subnet_ids["data"]]
+  subnet_ids               = [module.network.subnet_ids["app"]]
+  allowed_ipv4_addresses   = var.storage_allowed_ipv4_addresses
   tags                     = local.common_tags
 
   depends_on = [module.network]

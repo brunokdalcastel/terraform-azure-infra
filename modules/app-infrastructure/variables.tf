@@ -128,6 +128,13 @@ variable "storage_account_tier" {
   default     = "Standard"
 }
 
+variable "storage_allowed_ipv4_addresses" {
+  description = "IPv4 administrativos do Storage; validação no módulo storage."
+  type        = set(string)
+  default     = []
+  nullable    = false
+}
+
 variable "storage_replication_type" {
   description = "Tipo de replicação da Storage Account"
   type        = string

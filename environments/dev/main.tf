@@ -17,6 +17,7 @@ terraform {
 provider "azurerm" {
   subscription_id                 = var.subscription_id
   resource_provider_registrations = "none"
+  storage_use_azuread             = true
   features {
     resource_group {
       prevent_deletion_if_contains_resources = false
@@ -49,6 +50,7 @@ module "app_infrastructure" {
   common_tags  = var.common_tags
 
   # Passando variáveis opcionais (se definidas) ou usando defaults do módulo
-  storage_account_tier     = var.storage_account_tier
-  storage_replication_type = var.storage_replication_type
+  storage_account_tier           = var.storage_account_tier
+  storage_replication_type       = var.storage_replication_type
+  storage_allowed_ipv4_addresses = var.storage_allowed_ipv4_addresses
 }

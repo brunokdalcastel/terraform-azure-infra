@@ -38,3 +38,17 @@ variable "tags" {
   description = "Tags dos recursos"
   type        = map(string)
 }
+
+variable "allowed_ipv4_addresses" {
+  description = "IPv4 individuais aprovados do executor; sem CIDR. Vazio permite somente as subnets configuradas."
+  type        = set(string)
+  default     = []
+  nullable    = false
+  validation {
+    condition = alltrue([
+      for address in var.allowed_ipv4_addresses :
+      can(regex("^[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+$", address)) && can(cidrnetmask("${address}/32"))
+    ])
+    error_message = "Informe IPv4 individuais válidos; CIDR e IPv6 não são aceitos."
+  }
+}

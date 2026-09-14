@@ -33,7 +33,9 @@ resource "azurerm_storage_account" "main" {
   min_tls_version                 = "TLS1_2"
   https_traffic_only_enabled      = true
   allow_nested_items_to_be_public = false
-  shared_access_key_enabled       = true
+  shared_access_key_enabled       = false
+  default_to_oauth_authentication = true
+  public_network_access_enabled   = true
 
   # Proteção contra exclusão acidental (mínimo 1 dia na v4.x)
   blob_properties {
@@ -48,10 +50,10 @@ resource "azurerm_storage_account" "main" {
 
   # Regras de rede
   network_rules {
-    default_action             = "Allow" # Temporário para deploy - mude para "Deny" em produção
-    bypass                     = ["AzureServices", "Logging", "Metrics"]
+    default_action             = "Deny"
+    bypass                     = ["None"]
     virtual_network_subnet_ids = var.subnet_ids
-    ip_rules                   = [] # Adicione seu IP para acesso local
+    ip_rules                   = var.allowed_ipv4_addresses
   }
 }
 

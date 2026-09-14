@@ -102,8 +102,8 @@ só terão valores de infraestrutura após um deploy real.
 
 - State pode conter dados sensíveis, inclusive a senha das VMs. Guardar a senha
   também no Key Vault não elimina sua presença no state.
-- Storage exige HTTPS/TLS 1.2 e containers privados, mas permite rede de qualquer
-  origem. Autenticação continua necessária.
+- Storage usa Entra ID, firewall Deny e subnet App; IPs administrativos são explícitos.
+  Rede e RBAC ainda precisam de preparação real. Veja [acesso ao Storage](docs/storage-security.md).
 - Key Vault permite rede no DEV; em PROD o módulo configura Deny. O acesso do
   futuro executor de deploy precisa ser resolvido antes dessa etapa.
 - NSGs têm bloqueio final de entrada e regras entre camadas derivadas das subnets.

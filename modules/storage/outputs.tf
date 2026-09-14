@@ -13,12 +13,6 @@ output "primary_blob_endpoint" {
   value       = azurerm_storage_account.main.primary_blob_endpoint
 }
 
-output "primary_access_key" {
-  description = "Chave de acesso primária"
-  value       = azurerm_storage_account.main.primary_access_key
-  sensitive   = true
-}
-
 output "container_names" {
   description = "Nomes dos containers criados"
   value = [

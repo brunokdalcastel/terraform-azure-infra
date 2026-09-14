@@ -36,3 +36,6 @@ storage_account_tier = "Standard"
 # GRS = Geo-Redundant (staging/prod)
 # ZRS = Zone-Redundant (alta disponibilidade)
 storage_replication_type = "LRS"
+
+# Preparar rede e RBAC antes da execução aprovada. Não habilita acesso anônimo.
+storage_allowed_ipv4_addresses = []

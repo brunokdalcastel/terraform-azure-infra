@@ -1,4 +1,11 @@
 # Variáveis que vêm do arquivo .tfvars (environment specific)
+variable "storage_allowed_ipv4_addresses" {
+  description = "IPs individuais aprovados para acessar o Storage; vazio por padrão."
+  type        = set(string)
+  default     = []
+  nullable    = false
+}
+
 variable "common_tags" {
   description = "Tags adicionais; as tags de governança do módulo têm precedência."
   type        = map(string)

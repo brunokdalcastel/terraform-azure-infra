@@ -104,8 +104,8 @@ só terão valores de infraestrutura após um deploy real.
   também no Key Vault não elimina sua presença no state.
 - Storage usa Entra ID, firewall Deny e subnet App; IPs administrativos são explícitos.
   Rede e RBAC ainda precisam de preparação real. Veja [acesso ao Storage](docs/storage-security.md).
-- Key Vault permite rede no DEV; em PROD o módulo configura Deny. O acesso do
-  futuro executor de deploy precisa ser resolvido antes dessa etapa.
+- Key Vault usa RBAC e firewall Deny em DEV/PROD. Permissões e rede do executor
+  ainda precisam ser preparadas; veja [Key Vault](docs/key-vault-security.md).
 - NSGs têm bloqueio final de entrada e regras entre camadas derivadas das subnets.
   SSH não está habilitado; acesso administrativo e saída ainda exigem revisão.
   Veja a [política de rede](docs/network-security.md).

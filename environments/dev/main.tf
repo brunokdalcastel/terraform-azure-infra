@@ -28,7 +28,7 @@ provider "azurerm" {
       skip_shutdown_and_force_delete = false
     }
     key_vault {
-      purge_soft_delete_on_destroy    = true
+      purge_soft_delete_on_destroy    = false
       recover_soft_deleted_key_vaults = true
     }
   }
@@ -41,13 +41,14 @@ provider "azurerm" {
 module "app_infrastructure" {
   source = "../../modules/app-infrastructure"
 
-  project_name = var.project_name
-  environment  = var.environment
-  location     = var.location
-  vm_count     = var.vm_count
-  vm_size      = var.vm_size
-  owner        = var.owner
-  common_tags  = var.common_tags
+  project_name                     = var.project_name
+  environment                      = var.environment
+  location                         = var.location
+  vm_count                         = var.vm_count
+  vm_size                          = var.vm_size
+  owner                            = var.owner
+  key_vault_allowed_ipv4_addresses = var.key_vault_allowed_ipv4_addresses
+  common_tags                      = var.common_tags
 
   # Passando variáveis opcionais (se definidas) ou usando defaults do módulo
   storage_account_tier           = var.storage_account_tier

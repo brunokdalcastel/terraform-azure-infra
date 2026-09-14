@@ -156,3 +156,10 @@ variable "common_tags" {
   default     = {}
   nullable    = false
 }
+
+variable "key_vault_allowed_ipv4_addresses" {
+  description = "IPv4 individuais aprovados para Key Vault; vazio por padrão."
+  type        = set(string)
+  default     = []
+  nullable    = false
+}

@@ -1,52 +1,37 @@
-# Contribuindo
+# Contribuir com o projeto
 
-Obrigado pelo interesse em contribuir com este projeto!
+Este portfólio evolui com uma mudança lógica por branch e Pull Request. Comece
+pelo estado atual do [README](README.md) e pelas [regras do projeto](AGENTS.md).
+O [plano](PROJECT_PLAN.md) inclui etapas futuras; não representa entregas concluídas.
 
-## Como Contribuir
+## Fluxo de revisão
 
-1. Faça um fork do repositório
-2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
-3. Faça commit das suas mudanças (`git commit -m 'Adiciona nova feature'`)
-4. Faça push para a branch (`git push origin feature/nova-feature`)
-5. Abra um Pull Request
+1. Crie uma branch a partir de main atualizado e delimite o problema.
+2. Implemente a mudança e atualize a documentação afetada.
+3. Valide conforme o escopo e registre os resultados no modelo de PR.
+4. Revise o diff para evitar arquivos locais, credenciais e mudanças fora do escopo.
+5. Abra a PR e confira os checks e o conteúdo antes do merge.
 
-## Padrões de Código
+Para alterações Terraform, siga os comandos de [validação sem Azure](README.md#validação-sem-conta-azure)
+nos roots afetados: DEV, PROD e/ou bootstrap/backend. Uma alteração em módulo
+compartilhado pode afetar DEV e PROD. Preserve os lock files e use testes com mocks.
+Para documentação, revise conteúdo, links relativos e `git diff --check`;
+não é necessário repetir testes Terraform quando nenhum código mudou.
 
-### Terraform
+O CI atual executa fmt, init sem backend, validate e testes simulados nos três
+roots. O Checkov é report-only: um check verde não comprova ausência de findings.
+Registre falhas e limitações; não substitua evidência por uma caixa marcada.
 
-- Use `terraform fmt` antes de commitar
-- Siga a [convenção de nomenclatura do Azure](https://docs.microsoft.com/azure/cloud-adoption-framework/ready/azure-best-practices/resource-naming)
-- Documente todas as variáveis e outputs
-- Use `validation` blocks para validar inputs
+## Limite da autorização
 
-### Commits
+Não executar autenticação ou comandos contra Azure, plan com providers reais,
+bootstrap, migração de state, apply, destroy, import ou alterações de permissões.
+A etapa real depende de conta Azure e aprovação manual explícita do proprietário.
+Merge de código não autoriza deploy.
 
-Use mensagens de commit descritivas:
+Não versionar credenciais, chaves privadas, state, planos salvos ou tfvars reais.
+Use placeholders nos exemplos. Mudanças de rede, autenticação ou endereços de
+recursos devem explicar possíveis interrupções e efeitos no state existente.
 
-```
-feat: adiciona suporte a múltiplas regiões
-fix: corrige erro na criação do NSG
-docs: atualiza README com novos exemplos
-refactor: simplifica módulo de network
-```
-
-## Estrutura de Branches
-
-- `main` - Código estável e testado
-- `develop` - Desenvolvimento ativo
-- `feature/*` - Novas funcionalidades
-- `fix/*` - Correções de bugs
-
-## Reportando Bugs
-
-Ao reportar um bug, inclua:
-
-1. Versão do Terraform (`terraform version`)
-2. Versão do Azure Provider
-3. Descrição do problema
-4. Passos para reproduzir
-5. Output do erro (se aplicável)
-
-## Sugestões
-
-Sugestões são bem-vindas! Abra uma issue descrevendo sua ideia.
+Este documento e o modelo de PR orientam a revisão humana. Eles não configuram
+proteção de branch, revisores obrigatórios ou aprovação de environments no GitHub.

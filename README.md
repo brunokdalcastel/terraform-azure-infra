@@ -20,6 +20,7 @@ Merge de código não autoriza deploy.
 | Governança | Prefixos validados e tags estáveis/protegidas | ADRs e validação operacional |
 
 Veja [PROJECT_PLAN.md](PROJECT_PLAN.md) e as regras em [AGENTS.md](AGENTS.md).
+Para mudanças e revisão de PRs, siga [CONTRIBUTING.md](CONTRIBUTING.md).
 
 O [bootstrap do backend](bootstrap/backend/README.md) é independente da aplicação.
 Seu código prepara o destino do state; nenhum Storage foi provisionado e o backend

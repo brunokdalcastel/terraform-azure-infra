@@ -48,11 +48,16 @@ variable "subnet_id" {
   type        = string
 }
 
-variable "key_vault_id" {
-  description = "ID do Key Vault para armazenar secrets"
+variable "admin_ssh_public_key" {
+  description = "Chave pública RSA OpenSSH do operador. Nunca fornecer a chave privada."
   type        = string
+  default     = ""
+  nullable    = false
+  validation {
+    condition     = var.vm_count == 0 || can(regex("^ssh-rsa [A-Za-z0-9+/]+={0,3}( .*)?$", trimspace(var.admin_ssh_public_key)))
+    error_message = "VMs habilitadas exigem chave pública RSA OpenSSH; o provider valida o material da chave."
+  }
 }
-
 variable "tags" {
   description = "Tags dos recursos"
   type        = map(string)

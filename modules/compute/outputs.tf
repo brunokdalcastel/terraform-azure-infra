@@ -19,7 +19,7 @@ output "vm_identities" {
 }
 
 output "admin_password_secret_id" {
-  description = "ID do secret da senha no Key Vault"
-  value       = one(azurerm_key_vault_secret.admin_password[*].id)
+  description = "Compatibilidade legada: sempre null, pois novas VMs usam chave SSH."
+  value       = null
   sensitive   = true
 }

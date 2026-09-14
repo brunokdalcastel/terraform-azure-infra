@@ -12,7 +12,7 @@ quantidade de VMs a uma: outros ambientes precisam definir suas próprias polít
 
 ## O que zero VMs significa
 
-O plano deixa de incluir VMs, NICs, senha aleatória e secret de compute. Resource
+O plano deixa de incluir VMs e NICs. Compute não gera senhas ou secrets. Resource
 Group, rede, Storage e Key Vault continuam no código. Portanto zero VMs não é
 custo zero caso o restante seja provisionado. No estado atual, nenhum comando
 contra Azure é autorizado e nenhuma conta é necessária para os testes locais.
@@ -48,8 +48,7 @@ Apresentar o plano real e a estimativa ao proprietário antes de executar.
 O default mudou de uma VM D2s_v3 para zero VMs. Em um ambiente já provisionado,
 essa alteração pode propor destruição. Redefinir `vm_count = 1` e revisar o SKU
 antes de qualquer plano/aplicação real. Mudança de SKU também pode afetar a VM.
-Os blocos `moved` preservam os endereços da senha e do secret quando compute
-continua habilitado; não evitam destruição quando a quantidade muda para zero.
+A migração para SSH usa blocos removed sem destruição das credenciais legadas; veja [acesso às VMs](vm-access.md).
 Nenhuma migração real ou alteração de state foi executada nesta etapa.
 
 ## Para defender em entrevista

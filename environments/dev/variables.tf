@@ -88,3 +88,17 @@ variable "key_vault_allowed_ipv4_addresses" {
   default     = []
   nullable    = false
 }
+
+variable "admin_ssh_public_key" {
+  description = "Chave pública RSA OpenSSH para a futura execução aprovada; nunca chave privada."
+  type        = string
+  default     = ""
+  nullable    = false
+}
+
+variable "admin_source_cidrs" {
+  description = "Hosts administrativos privados /32, alcançáveis por rota privada a revisar."
+  type        = set(string)
+  default     = []
+  nullable    = false
+}

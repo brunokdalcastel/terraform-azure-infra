@@ -5,35 +5,7 @@
 # Variáveis definidas em variables.tf
 
 # ==============================================================================
-# SENHA ALEATÓRIA
-# ==============================================================================
-
-resource "random_password" "admin_password" {
-  count            = var.vm_count > 0 ? 1 : 0
-  length           = 20
-  special          = true
-  override_special = "!@#$%&*()-_=+[]{}|"
-  min_lower        = 2
-  min_upper        = 2
-  min_numeric      = 2
-  min_special      = 2
-}
-
-# ==============================================================================
-# ARMAZENA SENHA NO KEY VAULT
-# ==============================================================================
-
-resource "azurerm_key_vault_secret" "admin_password" {
-  count        = var.vm_count > 0 ? 1 : 0
-  name         = "vm-admin-password"
-  value        = random_password.admin_password[0].result
-  key_vault_id = var.key_vault_id
-
-  tags = var.tags
-}
-
-# ==============================================================================
-# NETWORK INTERFACES
+# INTERFACES DE REDE PRIVADAS
 # ==============================================================================
 
 resource "azurerm_network_interface" "main" {
@@ -64,9 +36,14 @@ resource "azurerm_linux_virtual_machine" "main" {
   size                = var.vm_size
   tags                = var.tags
 
-  admin_username                  = var.admin_username
-  admin_password                  = random_password.admin_password[0].result
-  disable_password_authentication = false
+  admin_username = var.admin_username
+
+  disable_password_authentication = true
+
+  admin_ssh_key {
+    username   = var.admin_username
+    public_key = var.admin_ssh_public_key
+  }
 
   network_interface_ids = [
     azurerm_network_interface.main[count.index].id

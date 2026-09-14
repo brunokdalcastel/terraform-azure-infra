@@ -67,8 +67,10 @@ run "reject_dev_environment" {
 run "one_vm_explicitly_enabled" {
   command = plan
   variables {
-    vm_count = 1
-    vm_size  = "Standard_B2s"
+    admin_ssh_public_key = trimspace(file("tests/mock_rsa.pub"))
+    admin_source_cidrs   = ["10.0.2.10/32"]
+    vm_count             = 1
+    vm_size              = "Standard_B2s"
   }
   assert {
     condition     = length(output.vm_ids) == 1 && length(output.vm_private_ips) == 1

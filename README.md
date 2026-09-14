@@ -36,7 +36,7 @@ environments/dev
     ├── network  → VNet, subnets Web/App/Data e NSGs
     ├── security → Key Vault; depende da rede
     ├── storage  → Storage Account e containers data/logs/backups
-    └── compute  → NICs e VMs na subnet App; depende da rede e Key Vault
+    └── compute  → NICs e VMs na subnet App; depende da rede
 ```
 
 As VMs usam Ubuntu 22.04 e um script que instala Docker. Não há IP público,
@@ -100,17 +100,16 @@ só terão valores de infraestrutura após um deploy real.
 
 ## Limitações conhecidas
 
-- State pode conter dados sensíveis, inclusive a senha das VMs. Guardar a senha
-  também no Key Vault não elimina sua presença no state.
+- States históricos podem conter senhas; a configuração atual usa somente chave SSH.
 - Storage usa Entra ID, firewall Deny e subnet App; IPs administrativos são explícitos.
   Rede e RBAC ainda precisam de preparação real. Veja [acesso ao Storage](docs/storage-security.md).
 - Key Vault usa RBAC e firewall Deny em DEV/PROD. Permissões e rede do executor
   ainda precisam ser preparadas; veja [Key Vault](docs/key-vault-security.md).
 - NSGs têm bloqueio final de entrada e regras entre camadas derivadas das subnets.
-  SSH não está habilitado; acesso administrativo e saída ainda exigem revisão.
+  SSH permite hosts privados /32 explícitos; conectividade e saída exigem revisão.
   Veja a [política de rede](docs/network-security.md).
-- VMs usam senha e identidade gerenciada; permissões da identidade para serviços
-  não estão configuradas. O caminho de administração privada está pendente.
+- VMs usam chave RSA e identidade gerenciada; permissões da identidade para serviços
+  não estão configuradas. Veja [acesso às VMs](docs/vm-access.md).
 - Checkov reporta findings sem bloquear. CI verde não significa ausência de
   vulnerabilidades nem comprova funcionamento no Azure.
 

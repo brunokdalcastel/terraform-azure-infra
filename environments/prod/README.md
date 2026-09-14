@@ -37,7 +37,7 @@ em arquivo `.tfbackend` ignorado; nunca incluir credenciais.
 Não há state remoto inicializado, OIDC, credenciais ou isolamento RBAC provisionados.
 Rede, acesso do executor ao Key Vault, permissões, preços e quota precisam de revisão.
 Storage agora exige Entra ID e rede explícita; RBAC ainda precisa de preparação.
-As VMs usam senha. O CIDR padrão coincide com DEV; não planejar peering/conectividade
+As VMs exigem chave pública RSA e hosts privados /32 aprovados para SSH. O CIDR padrão coincide com DEV; não planejar peering/conectividade
 entre ambientes sem revisar endereçamento. Esses ajustes ficam para outra parcela.
 
 Zero VMs não significa custo zero. A proteção contra purge do Key Vault afeta

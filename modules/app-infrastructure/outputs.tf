@@ -68,7 +68,7 @@ output "vm_private_ips" {
 }
 
 output "admin_password_secret_id" {
-  description = "ID do secret no Key Vault com a senha de admin"
+  description = "Obsoleto: sempre null; VMs usam chave SSH"
   value       = module.compute.admin_password_secret_id
   sensitive   = true
 }

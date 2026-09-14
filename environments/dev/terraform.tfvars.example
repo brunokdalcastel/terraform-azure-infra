@@ -18,7 +18,7 @@ environment = "dev"
 location = "brazilsouth"
 
 # Número de VMs a serem criadas
-# Zero desabilita VMs, NICs e a senha/secret de compute, mas não os outros serviços
+# Zero desabilita VMs e NICs, mas não os outros serviços
 vm_count = 0
 
 # Apenas B1s/B2s no DEV; confirmar disponibilidade e preço antes de habilitar 1 VM
@@ -39,3 +39,8 @@ storage_replication_type = "LRS"
 
 # Preparar rede e RBAC antes da execução aprovada. Não habilita acesso anônimo.
 storage_allowed_ipv4_addresses = []
+
+# Para vm_count = 1: chave pública RSA do operador e hosts privados /32 aprovados.
+# A conectividade privada precisa ser preparada; nunca inserir chave privada.
+admin_ssh_public_key = ""
+admin_source_cidrs = []

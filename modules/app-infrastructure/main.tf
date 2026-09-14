@@ -38,7 +38,8 @@ resource "azurerm_resource_group" "main" {
 # ==============================================================================
 
 module "network" {
-  source = "../network"
+  admin_source_cidrs = var.admin_source_cidrs
+  source             = "../network"
 
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
@@ -93,16 +94,16 @@ module "storage" {
 module "compute" {
   source = "../compute"
 
-  resource_group_name = azurerm_resource_group.main.name
-  location            = azurerm_resource_group.main.location
-  name_prefix         = local.name_prefix
-  vm_count            = var.vm_count
-  vm_size             = var.vm_size
-  admin_username      = var.admin_username
-  vm_image            = var.vm_image
-  subnet_id           = module.network.subnet_ids["app"]
-  key_vault_id        = module.security.key_vault_id
-  tags                = local.common_tags
+  resource_group_name  = azurerm_resource_group.main.name
+  location             = azurerm_resource_group.main.location
+  name_prefix          = local.name_prefix
+  vm_count             = var.vm_count
+  vm_size              = var.vm_size
+  admin_username       = var.admin_username
+  vm_image             = var.vm_image
+  subnet_id            = module.network.subnet_ids["app"]
+  admin_ssh_public_key = var.admin_ssh_public_key
+  tags                 = local.common_tags
 
-  depends_on = [module.network, module.security]
+  depends_on = [module.network]
 }

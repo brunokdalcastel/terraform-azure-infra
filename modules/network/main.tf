@@ -99,6 +99,20 @@ resource "azurerm_network_security_group" "web" {
 }
 
 resource "azurerm_network_security_group" "app" {
+  dynamic "security_rule" {
+    for_each = length(var.admin_source_cidrs) > 0 ? [1] : []
+    content {
+      name                         = "AllowSSHFromApprovedHosts"
+      priority                     = 200
+      direction                    = "Inbound"
+      access                       = "Allow"
+      protocol                     = "Tcp"
+      source_port_range            = "*"
+      destination_port_range       = "22"
+      source_address_prefixes      = var.admin_source_cidrs
+      destination_address_prefixes = var.subnets["app"].address_prefixes
+    }
+  }
   name                = "nsg-app-${var.name_prefix}"
   location            = var.location
   resource_group_name = var.resource_group_name

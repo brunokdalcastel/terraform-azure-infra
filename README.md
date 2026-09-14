@@ -17,7 +17,7 @@ Merge de código não autoriza deploy.
 | CI | fmt, init sem backend, validate e testes com mocks | TFLint e política de findings |
 | Segurança CI | Checkov report-only | Bloqueio de violações selecionadas |
 | Entrega | CI sem autenticação/deploy Azure | OIDC e execução manual aprovada |
-| Governança | Prefixo e tags centralizadas | Tags estáveis, ADRs e política de custos |
+| Governança | Prefixos validados e tags estáveis/protegidas | ADRs e validação operacional |
 
 Veja [PROJECT_PLAN.md](PROJECT_PLAN.md) e as regras em [AGENTS.md](AGENTS.md).
 
@@ -110,13 +110,15 @@ só terão valores de infraestrutura após um deploy real.
   interno pela regra padrão da VNet. Há CIDRs fixos nas regras.
 - VMs usam senha e identidade gerenciada; permissões da identidade para serviços
   não estão configuradas. O caminho de administração privada está pendente.
-- A tag CreatedAt usa timestamp() e pode gerar mudanças recorrentes no plan.
 - Checkov reporta findings sem bloquear. CI verde não significa ausência de
   vulnerabilidades nem comprova funcionamento no Azure.
 
 Esses pontos serão tratados em mudanças próprias, com justificativa e validação.
 
 ## Custos e execução futura
+
+As [convenções de nomes e tags](docs/naming-tags.md) documentam limites e
+precedência. DEV/PROD aceitam `common_tags` para informações adicionais estáveis.
 
 Não há garantia de Free Tier. O default é **zero VMs**; habilitar uma VM exige
 escolha explícita e revisão de preço/disponibilidade do SKU B1s ou B2s.

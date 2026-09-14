@@ -46,6 +46,7 @@ module "app_infrastructure" {
   vm_count     = var.vm_count
   vm_size      = var.vm_size
   owner        = var.owner
+  common_tags  = var.common_tags
 
   # Passando variáveis opcionais (se definidas) ou usando defaults do módulo
   storage_account_tier     = var.storage_account_tier

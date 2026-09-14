@@ -74,6 +74,11 @@ output "admin_password_secret_id" {
 }
 
 # Summary
+output "common_tags" {
+  description = "Tags efetivas estáveis, compartilhadas pelos recursos que suportam tags."
+  value       = local.common_tags
+}
+
 output "deployment_summary" {
   description = "Resumo do deployment"
   value = {

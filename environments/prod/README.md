@@ -36,7 +36,7 @@ em arquivo `.tfbackend` ignorado; nunca incluir credenciais.
 
 Não há state remoto inicializado, OIDC, credenciais ou isolamento RBAC provisionados.
 Rede, acesso do executor ao Key Vault, permissões, preços e quota precisam de revisão.
-Os módulos ainda têm regras permissivas de Storage/NSG e usam autenticação de VM
+Os módulos ainda têm regras permissivas de Storage e usam autenticação de VM
 por senha. O CIDR padrão coincide com DEV; não planejar peering/conectividade
 entre ambientes sem revisar endereçamento. Esses ajustes ficam para outra parcela.
 

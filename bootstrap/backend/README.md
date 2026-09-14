@@ -1,7 +1,7 @@
 # Bootstrap do backend Terraform
 
 **Status: código e testes simulados. Não provisionado.** Nenhum state foi migrado.
-O DEV continua com backend local; esta configuração prepara somente o destino futuro.
+O DEV tem configuração AzureRM preparada, ainda sem inicialização ou migração real.
 
 ## Decisão e escopo
 
@@ -78,8 +78,8 @@ como `dev.terraform.tfstate`; PROD usará outra chave. Separar chaves não repre
 isolamento de permissões. A decisão de containers/contas por ambiente será revisada
 quando PROD e OIDC forem preparados.
 
-Esta PR não configura backend remoto no DEV nem executa migração. Essas etapas
-serão mudanças separadas e a validação real só ocorrerá ao final, com aprovação.
+O [backend DEV](../../environments/dev/README.md) é preparado separadamente.
+Nenhuma migração foi executada; a validação real só ocorrerá ao final, com aprovação.
 
 ## Referências
 

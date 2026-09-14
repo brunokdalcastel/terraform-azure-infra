@@ -12,10 +12,6 @@ terraform {
     }
   }
 
-  # Backend Local - Estado salvo no computador (ambiente de lab)
-  backend "local" {
-    path = "terraform.tfstate"
-  }
 }
 
 provider "azurerm" {

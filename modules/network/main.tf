@@ -60,40 +60,40 @@ resource "azurerm_network_security_group" "web" {
 
   # Regra para HTTP
   security_rule {
-    name                       = "AllowHTTP"
-    priority                   = 100
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "80"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
+    name                         = "AllowHTTP"
+    priority                     = 100
+    direction                    = "Inbound"
+    access                       = "Allow"
+    protocol                     = "Tcp"
+    source_port_range            = "*"
+    destination_port_range       = "80"
+    source_address_prefix        = "Internet"
+    destination_address_prefixes = var.subnets["web"].address_prefixes
   }
 
   # Regra para HTTPS
   security_rule {
-    name                       = "AllowHTTPS"
-    priority                   = 110
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "443"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
+    name                         = "AllowHTTPS"
+    priority                     = 110
+    direction                    = "Inbound"
+    access                       = "Allow"
+    protocol                     = "Tcp"
+    source_port_range            = "*"
+    destination_port_range       = "443"
+    source_address_prefix        = "Internet"
+    destination_address_prefixes = var.subnets["web"].address_prefixes
   }
 
-  # Regra para SSH (apenas de IPs internos)
+  # Explicit deny precedes Azure's default AllowVNetInBound.
   security_rule {
-    name                       = "AllowSSH"
-    priority                   = 120
+    name                       = "DenyAllInbound"
+    priority                   = 4096
     direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
+    access                     = "Deny"
+    protocol                   = "*"
     source_port_range          = "*"
-    destination_port_range     = "22"
-    source_address_prefix      = "10.0.0.0/16"
+    destination_port_range     = "*"
+    source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
 }
@@ -106,27 +106,27 @@ resource "azurerm_network_security_group" "app" {
 
   # Regra para comunicação da subnet web
   security_rule {
-    name                       = "AllowWebSubnet"
-    priority                   = 100
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_ranges    = ["8080", "8443"]
-    source_address_prefix      = "10.0.1.0/24"
-    destination_address_prefix = "*"
+    name                         = "AllowWebSubnet"
+    priority                     = 100
+    direction                    = "Inbound"
+    access                       = "Allow"
+    protocol                     = "Tcp"
+    source_port_range            = "*"
+    destination_port_ranges      = ["8080", "8443"]
+    source_address_prefixes      = var.subnets["web"].address_prefixes
+    destination_address_prefixes = var.subnets["app"].address_prefixes
   }
 
-  # Regra para SSH interno
+  # Administrative access requires a separately reviewed explicit rule.
   security_rule {
-    name                       = "AllowSSHInternal"
-    priority                   = 110
+    name                       = "DenyAllInbound"
+    priority                   = 4096
     direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
+    access                     = "Deny"
+    protocol                   = "*"
     source_port_range          = "*"
-    destination_port_range     = "22"
-    source_address_prefix      = "10.0.0.0/16"
+    destination_port_range     = "*"
+    source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
 }
@@ -139,15 +139,15 @@ resource "azurerm_network_security_group" "data" {
 
   # Regra para comunicação da subnet app
   security_rule {
-    name                       = "AllowAppSubnet"
-    priority                   = 100
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_ranges    = ["1433", "3306", "5432"]
-    source_address_prefix      = "10.0.2.0/24"
-    destination_address_prefix = "*"
+    name                         = "AllowAppSubnet"
+    priority                     = 100
+    direction                    = "Inbound"
+    access                       = "Allow"
+    protocol                     = "Tcp"
+    source_port_range            = "*"
+    destination_port_ranges      = ["1433", "3306", "5432"]
+    source_address_prefixes      = var.subnets["app"].address_prefixes
+    destination_address_prefixes = var.subnets["data"].address_prefixes
   }
 
   # Bloqueia todo o resto

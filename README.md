@@ -106,8 +106,9 @@ só terão valores de infraestrutura após um deploy real.
   origem. Autenticação continua necessária.
 - Key Vault permite rede no DEV; em PROD o módulo configura Deny. O acesso do
   futuro executor de deploy precisa ser resolvido antes dessa etapa.
-- Apenas o NSG Data tem bloqueio final explícito. Web/App ainda permitem tráfego
-  interno pela regra padrão da VNet. Há CIDRs fixos nas regras.
+- NSGs têm bloqueio final de entrada e regras entre camadas derivadas das subnets.
+  SSH não está habilitado; acesso administrativo e saída ainda exigem revisão.
+  Veja a [política de rede](docs/network-security.md).
 - VMs usam senha e identidade gerenciada; permissões da identidade para serviços
   não estão configuradas. O caminho de administração privada está pendente.
 - Checkov reporta findings sem bloquear. CI verde não significa ausência de

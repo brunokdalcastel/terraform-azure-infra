@@ -9,6 +9,33 @@ mock_provider "azurerm" {
 }
 mock_provider "random" {}
 
+run "stable_governance_tags" {
+  command = plan
+  variables {
+    project_name = "lab-app"
+    common_tags = {
+      CostCenter = "learning"
+      Owner      = "override"
+      owner      = "override-lowercase"
+      CreatedAt  = "should-be-ignored"
+    }
+  }
+  assert {
+    condition = tomap(module.app_infrastructure.common_tags) == tomap({
+      Environment = "prod"
+      Project     = "lab-app"
+      ManagedBy   = "Terraform"
+      Owner       = "portfolio"
+      CostCenter  = "learning"
+    })
+    error_message = "Tags devem ser estáveis, preservar extras e proteger campos reservados inclusive variações de caixa."
+  }
+  assert {
+    condition     = output.resource_group_name == "rg-lab-app-prod"
+    error_message = "O formato de nomes existente deve ser preservado."
+  }
+}
+
 variables {
   subscription_id = "00000000-0000-0000-0000-000000000000"
   project_name    = "costtest"

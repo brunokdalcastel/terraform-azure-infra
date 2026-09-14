@@ -8,14 +8,15 @@ data "azurerm_client_config" "current" {}
 # Tags locais padronizadas
 locals {
   common_tags = merge(
+    { for key, value in var.common_tags : key => value
+      if !contains(["environment", "project", "managedby", "owner", "createdat"], lower(key))
+    },
     {
       Environment = var.environment
       Project     = var.project_name
       ManagedBy   = "Terraform"
       Owner       = var.owner
-      CreatedAt   = timestamp()
-    },
-    var.common_tags
+    }
   )
 
   # Naming convention

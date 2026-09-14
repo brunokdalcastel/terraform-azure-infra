@@ -1,4 +1,11 @@
 # Variáveis que vêm do arquivo .tfvars (environment specific)
+variable "common_tags" {
+  description = "Tags adicionais; as tags de governança do módulo têm precedência."
+  type        = map(string)
+  default     = {}
+  nullable    = false
+}
+
 
 variable "subscription_id" {
   description = "Azure Subscription ID"

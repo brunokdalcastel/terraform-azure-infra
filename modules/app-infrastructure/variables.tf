@@ -5,6 +5,14 @@
 variable "project_name" {
   description = "Nome do projeto (usado em naming conventions)"
   type        = string
+  nullable    = false
+  validation {
+    condition = (
+      can(regex("^[a-z][a-z0-9-]{0,19}$", var.project_name)) &&
+      length(replace(var.project_name, "-", "")) <= 9
+    )
+    error_message = "Use letra minúscula inicial, letras/números/hífens, até 20 caracteres e no máximo 9 sem hífens; o limite preserva os nomes de Storage também em staging."
+  }
 }
 
 variable "environment" {
@@ -25,9 +33,14 @@ variable "location" {
 }
 
 variable "owner" {
-  description = "Email do responsável pelo projeto"
+  description = "Identificador estável do responsável, sem dados pessoais sensíveis"
   type        = string
   default     = "admin@empresa.com"
+  nullable    = false
+  validation {
+    condition     = length(trimspace(var.owner)) > 0
+    error_message = "Owner não pode estar vazio."
+  }
 }
 
 # ==============================================================================
@@ -131,7 +144,8 @@ variable "storage_replication_type" {
 # ==============================================================================
 
 variable "common_tags" {
-  description = "Tags comuns aplicadas a todos os recursos"
+  description = "Tags adicionais. Environment, Project, ManagedBy, Owner e CreatedAt são reservadas, independentemente de maiúsculas."
   type        = map(string)
   default     = {}
+  nullable    = false
 }

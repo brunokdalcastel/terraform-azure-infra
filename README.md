@@ -13,7 +13,7 @@ Merge de código não autoriza deploy.
 | Área | Implementado no código | Próxima evolução |
 | --- | --- | --- |
 | Estrutura | DEV e cinco módulos | PROD e state separado |
-| State | Backend local; bootstrap de Storage preparado e testado com mocks | Provisionar backend, migrar DEV e validar locking |
+| State | Bootstrap e backend AzureRM DEV preparados em código | Provisionar backend, migrar eventual state e validar locking |
 | CI | fmt, init sem backend, validate e testes com mocks | TFLint e política de findings |
 | Segurança CI | Checkov report-only | Bloqueio de violações selecionadas |
 | Entrega | CI sem autenticação/deploy Azure | OIDC e execução manual aprovada |
@@ -23,7 +23,9 @@ Veja [PROJECT_PLAN.md](PROJECT_PLAN.md) e as regras em [AGENTS.md](AGENTS.md).
 
 O [bootstrap do backend](bootstrap/backend/README.md) é independente da aplicação.
 Seu código prepara o destino do state; nenhum Storage foi provisionado e o backend
-DEV continua local. A inicialização real exige revisão de rede e permissões.
+DEV está configurado para AzureRM, sem inicialização ou migração real.
+Veja a [preparação do DEV](environments/dev/README.md). A inicialização real exige
+aprovação e revisão de rede e permissões.
 
 ## Arquitetura atual do código
 
@@ -97,7 +99,7 @@ só terão valores de infraestrutura após um deploy real.
 
 ## Limitações conhecidas
 
-- State local contém dados sensíveis, inclusive a senha das VMs. Guardar a senha
+- State pode conter dados sensíveis, inclusive a senha das VMs. Guardar a senha
   também no Key Vault não elimina sua presença no state.
 - Storage exige HTTPS/TLS 1.2 e containers privados, mas permite rede de qualquer
   origem. Autenticação continua necessária.
@@ -134,7 +136,7 @@ de remoção. Toda execução Azure dependerá de aprovação manual explícita.
 - **Reprodutibilidade:** versão de referência, constraints e lock file reduzem
   diferenças entre máquina local e CI.
 - **Pull Requests:** cada mudança tem objetivo, diff e evidências de validação.
-- **Tradeoffs:** backend local e regras permissivas são lacunas identificadas.
+- **Tradeoffs:** migração e validação real do backend e regras permissivas são pendências identificadas.
   Remote state e OIDC só serão apresentados como concluídos após implementação
   e testes correspondentes.
 

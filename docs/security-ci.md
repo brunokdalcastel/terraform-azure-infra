@@ -38,7 +38,7 @@ a configuração declarada. A regra de HTTPS CKV_AZURE_3 desta versão inspecion
 atributo antigo e não foi incluída no bloqueio; não tratamos seu PASS como evidência
 do atributo atual. O escopo não cobre toda a segurança Azure.
 
-Os 20 findings restantes precisam de triagem em parcelas próprias; não representam
+Os 20 findings estão classificados na [triagem](security-triage.md) e aguardam tratamento; não representam
 exceções aprovadas nem ausência de risco. Novas regras bloqueantes exigem revisar
 o código avaliado e testar uma regressão deliberada antes de ampliar a lista.
 

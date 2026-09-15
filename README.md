@@ -14,14 +14,14 @@ Merge de código não autoriza deploy.
 | --- | --- | --- |
 | Estrutura | DEV/PROD com inputs e chaves de state próprias; cinco módulos | Validar ambientes reais e isolamento de permissões |
 | State | Bootstrap e backend AzureRM DEV preparados em código | Provisionar backend, migrar eventual state e validar locking |
-| CI | fmt, init sem backend, validate e testes com mocks | TFLint e política de findings |
+| CI | fmt, init sem backend, validate, testes com mocks e TFLint | Política de findings de segurança |
 | Segurança CI | Checkov report-only | Bloqueio de violações selecionadas |
 | Entrega | CI sem autenticação/deploy Azure | OIDC e execução manual aprovada |
 | Governança | Prefixos validados, tags estáveis/protegidas e ADRs | Validação operacional |
 
 Veja [PROJECT_PLAN.md](PROJECT_PLAN.md) e as regras em [AGENTS.md](AGENTS.md).
 Para mudanças e revisão de PRs, siga [CONTRIBUTING.md](CONTRIBUTING.md).
-Veja também os [registros de arquitetura (ADRs)](docs/adr/README.md).
+Veja também os [registros de arquitetura (ADRs)](docs/adr/README.md) e o [lint Terraform](docs/tflint.md).
 
 O [bootstrap do backend](bootstrap/backend/README.md) é independente da aplicação.
 Seu código prepara o destino do state; nenhum Storage foi provisionado e o backend

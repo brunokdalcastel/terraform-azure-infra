@@ -10,6 +10,21 @@ permissions:
   contents: read
 
 jobs:
+  lint:
+    name: TFLint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@1cf010d3c7aef302051ccdb68c14c5dc2efa34ef # v6
+        with:
+          tflint_version: v0.64.0
+      - name: Initialize bundled rules
+        run: tflint --init
+      - name: Lint roots and modules (no Azure)
+        run: tflint --recursive --config "$GITHUB_WORKSPACE/.tflint.hcl" --format compact
+
   validate:
     name: Validate (${{ matrix.root }})
     runs-on: ubuntu-latest

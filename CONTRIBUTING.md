@@ -18,7 +18,7 @@ compartilhado pode afetar DEV e PROD. Preserve os lock files e use testes com mo
 Para documentação, revise conteúdo, links relativos e `git diff --check`;
 não é necessário repetir testes Terraform quando nenhum código mudou.
 
-O CI atual executa fmt, init sem backend, validate e testes simulados nos três
+Execute também o [TFLint](docs/tflint.md) na raiz para alterações Terraform. O CI executa lint recursivo, fmt, init sem backend, validate e testes simulados nos três
 roots. O Checkov é report-only: um check verde não comprova ausência de findings.
 Registre falhas e limitações; não substitua evidência por uma caixa marcada.
 

@@ -13,12 +13,6 @@ variable "name_prefix" {
   type        = string
 }
 
-variable "environment" {
-  description = "Ambiente de deploy (dev, staging, prod)"
-  type        = string
-  default     = "dev"
-}
-
 variable "account_tier" {
   description = "Tier da Storage Account"
   type        = string

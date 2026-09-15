@@ -15,7 +15,7 @@ Merge de código não autoriza deploy.
 | Estrutura | DEV/PROD com inputs e chaves de state próprias; cinco módulos | Validar ambientes reais e isolamento de permissões |
 | State | Bootstrap e backend AzureRM DEV preparados em código | Provisionar backend, migrar eventual state e validar locking |
 | CI | fmt, init sem backend, validate, testes com mocks e TFLint | Política de findings de segurança |
-| Segurança CI | Checkov report-only | Bloqueio de violações selecionadas |
+| Segurança CI | Checkov bloqueia três regressões de Storage | Triagem dos demais findings |
 | Entrega | CI sem autenticação/deploy Azure | OIDC e execução manual aprovada |
 | Governança | Prefixos validados, tags estáveis/protegidas e ADRs | Validação operacional |
 
@@ -112,7 +112,7 @@ só terão valores de infraestrutura após um deploy real.
   Veja a [política de rede](docs/network-security.md).
 - VMs usam chave RSA e identidade gerenciada; permissões da identidade para serviços
   não estão configuradas. Veja [acesso às VMs](docs/vm-access.md).
-- Checkov reporta findings sem bloquear. CI verde não significa ausência de
+- Checkov bloqueia IDs selecionados; os demais findings ficam no relatório. CI verde não significa ausência de
   vulnerabilidades nem comprova funcionamento no Azure.
 
 Esses pontos serão tratados em mudanças próprias, com justificativa e validação.
@@ -159,3 +159,5 @@ Veja [CONTRIBUTING.md](CONTRIBUTING.md). Licença [MIT](LICENSE).
 - [Terraform: dados sensíveis](https://developer.hashicorp.com/terraform/language/manage-sensitive-data)
 - [Terraform: lock file](https://developer.hashicorp.com/terraform/language/files/dependency-lock)
 - [Azure: regras padrão de NSG](https://learn.microsoft.com/azure/virtual-network/network-security-groups-overview)
+
+Veja a [política de segurança do CI](docs/security-ci.md).

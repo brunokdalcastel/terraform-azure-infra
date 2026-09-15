@@ -181,3 +181,13 @@ variable "admin_source_cidrs" {
     error_message = "VMs habilitadas exigem ao menos um host administrativo privado explícito."
   }
 }
+
+variable "audit_workspace_id" {
+  description = "ID de Log Analytics existente e aprovado; null desabilita auditoria de blobs."
+  type        = string
+  default     = null
+  validation {
+    condition     = var.audit_workspace_id == null || can(regex("(?i)^/subscriptions/[0-9a-f-]{36}/resourceGroups/[^/]+/providers/Microsoft.OperationalInsights/workspaces/[^/]+$", var.audit_workspace_id))
+    error_message = "Forneça ID completo de Log Analytics ou null."
+  }
+}

@@ -46,3 +46,13 @@ variable "allowed_ipv4_addresses" {
     error_message = "Informe IPv4 individuais válidos; CIDR e IPv6 não são aceitos."
   }
 }
+
+variable "audit_workspace_id" {
+  description = "ID de Log Analytics existente e aprovado; null desabilita auditoria de blobs."
+  type        = string
+  default     = null
+  validation {
+    condition     = var.audit_workspace_id == null || can(regex("(?i)^/subscriptions/[0-9a-f-]{36}/resourceGroups/[^/]+/providers/Microsoft.OperationalInsights/workspaces/[^/]+$", var.audit_workspace_id))
+    error_message = "Forneça ID completo de Log Analytics ou null."
+  }
+}

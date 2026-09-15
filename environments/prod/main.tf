@@ -39,6 +39,7 @@ provider "azurerm" {
 # ==============================================================================
 
 module "app_infrastructure" {
+  audit_workspace_id   = var.audit_workspace_id
   admin_ssh_public_key = var.admin_ssh_public_key
   admin_source_cidrs   = var.admin_source_cidrs
   source               = "../../modules/app-infrastructure"

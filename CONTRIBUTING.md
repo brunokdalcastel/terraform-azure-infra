@@ -19,7 +19,7 @@ Para documentação, revise conteúdo, links relativos e `git diff --check`;
 não é necessário repetir testes Terraform quando nenhum código mudou.
 
 Execute também o [TFLint](docs/tflint.md) na raiz para alterações Terraform. O CI executa lint recursivo, fmt, init sem backend, validate e testes simulados nos três
-roots. O Checkov é report-only: um check verde não comprova ausência de findings.
+roots. O Checkov bloqueia três IDs de Storage; os demais findings são informativos. Veja [a política](docs/security-ci.md). Um check verde não comprova ausência de findings.
 Registre falhas e limitações; não substitua evidência por uma caixa marcada.
 
 ## Limite da autorização

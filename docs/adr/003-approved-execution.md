@@ -22,3 +22,7 @@ O [CI atual](../../.github/workflows/terraform.yml) executa fmt, init sem backen
 É possível revisar configuração sem criar recursos, mas mocks não comprovam RBAC, conectividade, quotas, preços ou provisionamento. OIDC e workflow de execução manual são etapas futuras. Este ADR não configura aprovação técnica de deploy; a regra documental não substitui esse controle. A futura implementação deverá exigir acionamento manual e aprovação, com escopo e impacto apresentados ao proprietário antes da execução.
 
 Evidência complementar: [processo de revisão](../../CONTRIBUTING.md).
+
+## Atualização em 2026-09-15
+
+O Checkov passou a bloquear três IDs de Storage, mantendo os demais findings no relatório; veja a [política de segurança](../security-ci.md). Isso não altera a decisão de executar Azure somente com aprovação.

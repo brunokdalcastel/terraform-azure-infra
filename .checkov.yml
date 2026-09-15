@@ -1,0 +1,8 @@
+framework:
+  - terraform
+skip-download: true
+hard-fail-on:
+  - CKV_AZURE_34
+  - CKV_AZURE_35
+  - CKV_AZURE_44
+compact: true

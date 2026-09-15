@@ -1,0 +1,66 @@
+# INACTIVE TEMPLATE. Review docs/azure-readiness.md before activation.
+name: Azure plan (manual)
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Environment to plan
+        required: true
+        type: choice
+        options: [dev, prod]
+permissions:
+  contents: read
+concurrency:
+  group: azure-${{ inputs.environment }}
+  cancel-in-progress: false
+jobs:
+  plan:
+    if: github.ref == 'refs/heads/main' && vars.AZURE_EXECUTION_ENABLED == 'true'
+    environment: ${{ inputs.environment }}-plan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      ARM_USE_OIDC: 'true'
+      ARM_USE_AZUREAD: 'true'
+      ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      TF_IN_AUTOMATION: 'true'
+      TF_INPUT: 'false'
+      TF_VAR_subscription_id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      TF_VAR_project_name: ${{ vars.PROJECT_NAME }}
+      TF_VAR_owner: ${{ vars.PROJECT_OWNER }}
+      TF_VAR_location: ${{ vars.AZURE_LOCATION }}
+      TF_VAR_environment: ${{ inputs.environment }}
+      TF_VAR_vm_count: '0'
+      BACKEND_RG: ${{ vars.BACKEND_RESOURCE_GROUP }}
+      BACKEND_ACCOUNT: ${{ vars.BACKEND_STORAGE_ACCOUNT }}
+      ROOT: environments/${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check required configuration
+        shell: bash
+        run: |
+          for name in ARM_CLIENT_ID ARM_TENANT_ID ARM_SUBSCRIPTION_ID TF_VAR_project_name TF_VAR_owner TF_VAR_location BACKEND_RG BACKEND_ACCOUNT; do
+            if [ -z "${!name}" ]; then
+              echo "Missing configuration: $name" >&2
+              exit 1
+            fi
+          done
+      - name: Read Terraform version
+        id: version
+        run: echo "value=$(cat .terraform-version)" >> "$GITHUB_OUTPUT"
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ steps.version.outputs.value }}
+      - name: Initialize approved remote backend
+        run: >-
+          terraform -chdir="$ROOT" init -input=false -lockfile=readonly
+          -backend-config="resource_group_name=$BACKEND_RG"
+          -backend-config="storage_account_name=$BACKEND_ACCOUNT"
+      - name: Validate
+        run: terraform -chdir="$ROOT" validate -no-color
+      - name: Plan only (no artifact or apply)
+        run: terraform -chdir="$ROOT" plan -input=false -lock-timeout=60s -no-color

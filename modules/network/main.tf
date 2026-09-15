@@ -58,19 +58,6 @@ resource "azurerm_network_security_group" "web" {
   resource_group_name = var.resource_group_name
   tags                = var.tags
 
-  # Regra para HTTP
-  security_rule {
-    name                         = "AllowHTTP"
-    priority                     = 100
-    direction                    = "Inbound"
-    access                       = "Allow"
-    protocol                     = "Tcp"
-    source_port_range            = "*"
-    destination_port_range       = "80"
-    source_address_prefix        = "Internet"
-    destination_address_prefixes = var.subnets["web"].address_prefixes
-  }
-
   # Regra para HTTPS
   security_rule {
     name                         = "AllowHTTPS"

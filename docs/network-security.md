@@ -2,7 +2,7 @@
 
 | Destino | Origem permitida | TCP |
 | --- | --- | --- |
-| Web | Service tag Internet | 80, 443 |
+| Web | Service tag Internet | 443 |
 | App | Prefixos configurados da subnet Web | 8080, 8443 |
 | App (opcional) | Hosts privados RFC1918 /32 explícitos | 22 |
 | Data | Prefixos configurados da subnet App | 1433, 3306, 5432 |
@@ -18,7 +18,7 @@ As regras podem interromper conexões entre pares e fluxos não listados em um
 ambiente existente. Nenhuma alteração foi aplicada no Azure.
 
 Não há regra de health probe para Azure Load Balancer: esse serviço não está
-implementado e precisará de revisão própria se for adicionado. Permitir 80/443
+implementado e precisará de revisão própria se for adicionado. Permitir 443
 no NSG não cria IP público, rota, aplicação ou endpoint Web.
 
 Esta parcela trata somente entrada. As regras padrão de saída permanecem; DNS,
@@ -28,3 +28,5 @@ Os testes verificam as regras declaradas com outro CIDR usando mocks; não testa
 tráfego ou estado de conexões no Azure. Validação real requer aprovação final.
 
 Referência: [NSGs e filtragem de tráfego](https://learn.microsoft.com/azure/virtual-network/network-security-group-how-it-works).
+
+HTTP 80 foi removido por não haver aplicação ou redirecionamento que o utilize. Uma futura reintrodução exige revisão. Em infraestrutura existente, a alteração interromperia novas conexões HTTP; nada foi aplicado.

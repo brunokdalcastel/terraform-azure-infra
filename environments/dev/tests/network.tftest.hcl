@@ -73,8 +73,8 @@ run "explicit_layer_boundaries" {
   }
   assert {
     condition = (
-      length(azurerm_network_security_group.web.security_rule) == 3 &&
-      toset([for rule in azurerm_network_security_group.web.security_rule : rule.destination_port_range if rule.access == "Allow"]) == toset(["80", "443"]) &&
+      length(azurerm_network_security_group.web.security_rule) == 2 &&
+      toset([for rule in azurerm_network_security_group.web.security_rule : rule.destination_port_range if rule.access == "Allow"]) == toset(["443"]) &&
       alltrue([for rule in azurerm_network_security_group.web.security_rule :
         rule.access != "Allow" || (
           rule.source_address_prefix == "Internet" &&
@@ -83,6 +83,6 @@ run "explicit_layer_boundaries" {
         )
       ])
     )
-    error_message = "Web deve aceitar somente HTTP/HTTPS de Internet, sem SSH genérico."
+    error_message = "Web deve aceitar somente HTTPS de Internet, sem SSH genérico."
   }
 }

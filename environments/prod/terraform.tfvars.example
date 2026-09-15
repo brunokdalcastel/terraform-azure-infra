@@ -44,3 +44,6 @@ storage_allowed_ipv4_addresses = []
 # A conectividade privada precisa ser preparada; nunca inserir chave privada.
 admin_ssh_public_key = ""
 admin_source_cidrs = []
+
+# Workspace existente, somente após revisão de custo e aprovação.
+audit_workspace_id = null

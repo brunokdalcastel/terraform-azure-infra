@@ -59,3 +59,36 @@ run "reject_open_cidr" {
   variables { allowed_ipv4_addresses = ["0.0.0.0/0"] }
   expect_failures = [var.allowed_ipv4_addresses]
 }
+
+run "audit_disabled_by_default" {
+  command = plan
+  module { source = "../../modules/storage" }
+  assert {
+    condition     = length(azurerm_monitor_diagnostic_setting.blob_audit) == 0
+    error_message = "Sem destino aprovado, nenhum diagnóstico deve ser criado."
+  }
+}
+
+run "audit_reads_writes_deletes" {
+  command = plan
+  module { source = "../../modules/storage" }
+  variables {
+    audit_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-audit/providers/Microsoft.OperationalInsights/workspaces/law-test"
+  }
+  override_resource {
+    override_during = plan
+    target          = azurerm_storage_account.main
+    values = {
+      id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-test/providers/Microsoft.Storage/storageAccounts/sttest"
+    }
+  }
+  assert {
+    condition = (
+      endswith(azurerm_monitor_diagnostic_setting.blob_audit[0].target_resource_id, "/blobServices/default") &&
+      azurerm_monitor_diagnostic_setting.blob_audit[0].log_analytics_workspace_id == var.audit_workspace_id &&
+      azurerm_monitor_diagnostic_setting.blob_audit[0].log_analytics_destination_type == "Dedicated" &&
+      toset([for log in azurerm_monitor_diagnostic_setting.blob_audit[0].enabled_log : log.category]) == toset(["StorageRead", "StorageWrite", "StorageDelete"])
+    )
+    error_message = "Auditoria deve cobrir operações de blobs no destino explícito."
+  }
+}

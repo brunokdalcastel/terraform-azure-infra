@@ -45,3 +45,7 @@ O proprietário revisará os riscos antes da primeira execução; não há skips
 Esta PR apenas registra a triagem: não corrige os recursos, não aceita riscos
 automaticamente e não altera a lista de regras bloqueantes. O encerramento de um
 item deve apontar a PR de tratamento e, quando necessário, evidência real aprovada.
+
+## Preparação posterior à triagem
+
+HTTP 80 removido na PR #16. Auditoria de blobs agora possui [configuração opcional](blob-audit.md), ainda desativada por padrão; a validação real continua pendente. O inventário acima preserva o baseline histórico.

@@ -1,4 +1,4 @@
-# Backend remoto DEV — configuração preparada
+# Backend remoto DEV
 
 `backend.tf` declara AzureRM com autenticação Entra ID e chave
 `dev.terraform.tfstate`, no container `tfstate`. As coordenadas do Storage são
@@ -6,10 +6,12 @@ parciais; `backend.tfbackend.example` contém apenas exemplos, não é carregado
 automaticamente e não contém credenciais. Uma futura cópia `backend.tfbackend`
 com os nomes reais fica ignorada pelo Git.
 
-**Nenhum Storage foi provisionado, nenhum state foi migrado e o locking real não
-foi testado.** O bootstrap mantém seu backend local independente.
+**Backend inicializado e testado em sessão temporária de 18/09/2026, depois removido.**
+O lock foi observado durante apply, sem ensaio de dois applies concorrentes ou
+migração de state existente. Veja as [evidências](../../docs/azure-validation-2026-09-18.md).
+O bootstrap mantém seu backend local independente.
 
-## Validação permitida agora
+## Validação local e CI
 
 Na raiz do repositório:
 
@@ -28,8 +30,8 @@ Não executar `init` sem `-backend=false` nesta etapa.
 
 - Autenticação do backend é independente do provider AzureRM. Não colocar chaves,
   SAS ou client secrets em HCL, arquivo de backend ou argumentos de CLI.
-- OIDC será configurado em outra parcela. Nenhum login é feito por esta mudança.
-- A chave identifica DEV; outro ambiente precisará de chave própria. Chaves
+- OIDC continua pendente; a sessão real usou login interativo via Azure CLI.
+- A chave identifica DEV; PROD possui chave própria no código. Chaves
   diferentes não isolam permissões dentro do mesmo container.
 - A identidade futura precisará de acesso aos blobs, preferindo Storage Blob
   Data Contributor no container. A configuração de rede do bootstrap também

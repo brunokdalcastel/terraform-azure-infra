@@ -12,7 +12,7 @@ O [plano](PROJECT_PLAN.md) inclui etapas futuras; não representa entregas concl
 4. Revise o diff para evitar arquivos locais, credenciais e mudanças fora do escopo.
 5. Abra a PR e confira os checks e o conteúdo antes do merge.
 
-Para alterações Terraform, siga os comandos de [validação sem Azure](README.md#validação-sem-conta-azure)
+Para alterações Terraform, siga os comandos de [validação local e CI](README.md#validação-local-e-ci)
 nos roots afetados: DEV, PROD e/ou bootstrap/backend. Uma alteração em módulo
 compartilhado pode afetar DEV e PROD. Preserve os lock files e use testes com mocks.
 Para documentação, revise conteúdo, links relativos e `git diff --check`;
@@ -26,7 +26,7 @@ Registre falhas e limitações; não substitua evidência por uma caixa marcada.
 
 Não executar autenticação ou comandos contra Azure, plan com providers reais,
 bootstrap, migração de state, apply, destroy, import ou alterações de permissões.
-A etapa real depende de conta Azure e aprovação manual explícita do proprietário.
+Novas sessões reais exigem aprovação manual explícita; a sessão DEV anterior foi encerrada.
 Merge de código não autoriza deploy.
 
 Não versionar credenciais, chaves privadas, state, planos salvos ou tfvars reais.

@@ -15,8 +15,8 @@ merge de código não autoriza deploy.
 | --- | --- | --- |
 | Estrutura | DEV/PROD com inputs e chaves de state próprias; cinco módulos | Validar ambientes reais e isolamento de permissões |
 | State | Bootstrap e backend DEV testados com Entra ID e lock observado | Validar recuperação completa e isolamento de PROD |
-| CI | fmt, init sem backend, validate, testes com mocks e TFLint | Política de findings de segurança |
-| Segurança CI | Checkov bloqueia três regressões de Storage | Triagem dos demais findings |
+| CI | fmt, init sem backend, validate, testes com mocks e TFLint | Manter cobertura ao evoluir módulos |
+| Segurança CI | Checkov bloqueia três regressões de Storage | Tratar os demais findings já triados |
 | Entrega | CI sem Azure; template inativo de plan OIDC manual | Configurar identidade/rede e validar execução aprovada |
 | Governança | Prefixos validados, tags estáveis/protegidas e ADRs | Validação operacional |
 
@@ -31,7 +31,7 @@ Veja a [preparação do DEV](environments/dev/README.md). A inicialização real
 aprovação e revisão de rede e permissões.
 
 Veja a [arquitetura](docs/architecture.md), o [roteiro de apresentação](docs/portfolio-presentation.md)
-e o [ponto de parada antes do Azure](docs/azure-readiness.md).
+e o [planejamento de novas execuções Azure](docs/azure-readiness.md).
 
 ## Arquitetura atual do código
 
@@ -80,7 +80,10 @@ aplicação Web, banco de dados, balanceador ou Bastion. Os containers são dest
 potenciais; envio de logs/backups não está implementado. Três subnets não
 representam uma aplicação completa em três camadas já funcionando.
 
-## Validação sem conta Azure
+## Validação local e CI
+
+Execute as verificações de qualidade e os testes com providers simulados sem
+acessar o Azure ou provisionar recursos.
 
 Pré-requisitos: Git, Terraform **1.14.3**, definido em
 [.terraform-version](.terraform-version), e internet para baixar providers.
@@ -160,13 +163,13 @@ Não há garantia de Free Tier. O default é **zero VMs**; habilitar uma VM exig
 escolha explícita e revisão de preço/disponibilidade do SKU B1s ou B2s.
 VMs, discos, Storage, operações de Key Vault e tráfego
 devem entrar na estimativa. Benefícios e disponibilidade dependem da assinatura
-e região. Nenhum recurso foi criado por esta etapa de preparação.
+e região. A sessão temporária e sua limpeza estão registradas nas evidências.
 
 Zero VMs não é custo zero: Storage e Key Vault permanecem no código. Veja
 [controle de custos](docs/cost-control.md), inclusive o impacto dos novos defaults
 em instalações existentes e as limitações dos testes simulados.
 
-A etapa final exigirá revisão de preços, quota, permissões, rede, backend e plano
+Uma nova sessão exigirá revisão de preços, quota, permissões, rede, backend e plano
 de remoção. Toda execução Azure dependerá de aprovação manual explícita.
 
 ## Como explicar o projeto em entrevista
@@ -175,9 +178,8 @@ de remoção. Toda execução Azure dependerá de aprovação manual explícita.
 - **Reprodutibilidade:** versão de referência, constraints e lock file reduzem
   diferenças entre máquina local e CI.
 - **Pull Requests:** cada mudança tem objetivo, diff e evidências de validação.
-- **Tradeoffs:** migração e validação real do backend e regras permissivas são pendências identificadas.
-  Remote state e OIDC só serão apresentados como concluídos após implementação
-  e testes correspondentes.
+- **Tradeoffs:** backend DEV e acesso aos dados foram testados em sessão temporária.
+  Recuperação completa do state, isolamento de PROD e OIDC continuam pendentes.
 
 ## CI e contribuição
 

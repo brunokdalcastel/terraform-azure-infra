@@ -34,7 +34,11 @@ O projeto deve continuar sendo **barato para executar em uma assinatura pessoal 
 
 ---
 
-# 2. Contexto atual do repositório
+# 2. Contexto original do planejamento
+
+Esta seção e os exemplos de implementação abaixo são históricos, não um inventário
+atual. Consulte o [README](README.md) e as [evidências](docs/azure-validation-2026-09-18.md)
+para entregas concluídas. DEV/PROD usam configuração AzureRM; o state local é do bootstrap.
 
 O repositório já possui:
 
@@ -59,7 +63,7 @@ O repositório já possui:
 - terraform-docs
 - estrutura inicial de CI
 
-O ambiente atual utiliza backend local:
+Na versão inicial, o ambiente utilizava backend local:
 
 ```hcl
 backend "local" {

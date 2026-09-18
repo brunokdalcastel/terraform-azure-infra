@@ -2,7 +2,7 @@
 
 ## Status
 
-Aceita em 2026-09-14. Configuração preparada, sem provisionamento ou migração.
+Aceita em 2026-09-14. Atualizada após a sessão temporária de 18/09/2026 e sua limpeza.
 
 ## Contexto
 
@@ -19,6 +19,6 @@ Manter um [bootstrap independente](../../bootstrap/backend/README.md) para RG, S
 
 ## Consequências
 
-Há uma etapa adicional de preparação e proteção do state do bootstrap. Rede, permissões de dados, recuperação e custo de retenção precisam de revisão real. Nenhum backend foi inicializado no Azure e nenhum state foi migrado. Locking e recuperação são objetivos de validação futura, não resultados dos mocks. Chaves separadas não impedem que uma identidade com acesso amplo leia ambos os states.
+Há uma etapa adicional de preparação e proteção do state do bootstrap. Rede, permissões de dados, recuperação e custo de retenção precisam de revisão real. O backend DEV foi inicializado no Azure, sem migração de state existente. Lock real foi observado e blobs sintéticos foram recuperados. Concorrência entre applies e recuperação completa de state continuam pendentes; veja as [evidências](../azure-validation-2026-09-18.md). Chaves separadas não impedem que uma identidade com acesso amplo leia ambos os states.
 
 Evidências e cuidados: [documentação do bootstrap](../../bootstrap/backend/README.md).

@@ -1,4 +1,4 @@
-# Ponto de parada antes do Azure
+# Planejamento de novas execuções Azure
 
 O código pode ser revisado sem assinatura. Este documento não autoriza execução.
 Este roteiro registra a preparação original. A assinatura foi criada e uma sessão
@@ -13,7 +13,7 @@ fmt/validate/mocks/TFLint/Checkov. Veja [triagem de segurança](security-triage.
 O [modelo de plan manual](templates/azure-plan.yml.example) está inativo, fora de
 `.github/workflows`. Ele nunca executa apply, não salva plano nem publica artefato.
 
-## Sequência depois de criar a assinatura
+## Sequência para uma nova sessão autorizada
 
 1. Confirmar tenant/subscription, benefícios, preços e região. Orçar recursos base,
    logs, discos, tráfego e retenção; zero VMs não significa custo zero. Definir data
@@ -76,11 +76,12 @@ ou force-unlock automático. Destruição é uma autorização separada.
 
 ## Evidências que ainda faltam
 
-Autenticação OIDC real; RBAC de dados/controle; acesso do runner ao backend; locking
-com concorrência controlada; recuperação de state; plano aprovado; eventual
-provisionamento; consultas dos logs; custos observados; conectividade privada SSH
-se uma VM for habilitada. Até isso existir, apresentar o projeto como preparado e
-testado estaticamente, não como plataforma Azure operacional.
+Autenticação OIDC real; RBAC das identidades do pipeline e isolamento de PROD;
+acesso do runner ao backend; locking com dois applies controlados; recuperação
+completa de state; consultas dos logs; custo final; conectividade privada SSH
+se uma VM for habilitada. Backend e DEV tiveram provisionamento, RBAC do operador
+e idempotência validados. Apresentar como laboratório testado e removido, sem
+afirmar operação contínua ou validação de PROD.
 
 Referências: [OIDC Azure no GitHub](https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-azure)
 e [claims OIDC](https://docs.github.com/en/actions/reference/security/oidc).

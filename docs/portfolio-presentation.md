@@ -1,36 +1,114 @@
-# Apresentação do portfólio
+# Apresentação e defesa do portfólio
 
 ## Abertura de um minuto
 
-“Preparei uma infraestrutura Azure em Terraform, com módulos reutilizáveis,
-ambientes separados e evolução por PRs. O foco foi tornar mudanças revisáveis:
-defaults conservadores de custo, testes simulados e verificações de qualidade e
-segurança no CI. Ainda não fiz deploy: separei explicitamente o que o código
-garante do que precisa de conta, rede e validação real no Azure.”
+“Desenvolvi um laboratório de infraestrutura Azure com Terraform, módulos
+reutilizáveis e mudanças revisadas por Pull Requests. Configurei CI com validação,
+testes simulados, lint e verificações de segurança. Em uma sessão autorizada,
+provisionei o backend e o DEV sem máquinas virtuais, validei acesso com Entra ID,
+RBAC, firewall e recuperação de blobs. Um novo plan não indicou mudanças.
+Depois removi os recursos e conferi o inventário da assinatura. O foco do projeto
+é demonstrar infraestrutura reproduzível, decisões de segurança e controle do
+ciclo de vida; PROD e OIDC ainda são evoluções planejadas.”
 
-## Demonstração
+Use essa fala como guia. Este é um laboratório de portfólio; não atribua a ele
+experiência de operação de uma aplicação em produção.
 
-1. Mostrar no README o estado real e os módulos. Explicar que três subnets não
-   representam uma aplicação completa em produção.
-2. Abrir uma PR de segurança e seus testes: por exemplo, remoção de HTTP ou SSH
-   somente por chave e hosts privados explícitos.
-3. Mostrar um CI aprovado e explicar fmt, validate, mocks, TFLint e a lista limitada
-   de checks bloqueantes. Mostrar a triagem, incluindo riscos ainda não resolvidos.
-4. Explicar separação dos states e ciclo de vida do bootstrap. Apontar que locking
-   remoto e recuperação ainda não foram testados.
-5. Encerrar com o plano de ativação manual e evidências que serão coletadas após
-   criar a assinatura. Não apresentar o template OIDC como autenticação já funcionando.
+## Demonstração de cinco minutos, sem deploy
 
-## Decisões para defender
+| Tempo | O que mostrar | O que explicar |
+| --- | --- | --- |
+| 0–1 min | [README](../README.md) e [arquitetura](architecture.md) | DEV/PROD no código, módulos e ausência de aplicação ou banco implantado |
+| 1–2 min | [Backend](../bootstrap/backend/README.md) e [DEV](../environments/dev/README.md) | State remoto, autenticação Entra ID e ciclo de vida separado do backend |
+| 2–3 min | [PR #19](https://github.com/brunokdalcastel/terraform-azure-infra/pull/19) e seus checks | Evidências revisáveis, CI e diferença entre mocks e testes reais |
+| 3–4 min | [Relatório da sessão](azure-validation-2026-09-18.md) | Negação antes de RBAC, acesso após role, firewall e recuperação de blob |
+| 4–5 min | Encerramento do relatório e [triagem](security-triage.md) | Limpeza, retenção do Key Vault, custo ainda sujeito a atualização e próximos testes |
 
-- Por que zero VMs? Exige intenção explícita antes de incluir compute; não elimina
-  custos dos outros serviços.
-- Por que não eliminar todos os alertas? Alguns exigem contexto e custo; evitar
-  supressões sem análise é parte da revisão. Check verde não significa seguro por completo.
-- Por que backend separado? O state tem ciclo de vida e recuperação diferentes da aplicação.
-- Por que não fazer deploy após merge? Aprovar código não aprova custo e operação.
-- O que falta comprovar? OIDC, permissões, conectividade, locking, recuperação,
-  entrega de logs e comportamento dos recursos reais.
+Abra as páginas antes da entrevista. A demonstração usa código e evidências
+sanitizadas; não depende de recursos ativos. Não abra state, tfvars reais, planos
+salvos ou telas com credenciais. Se pedirem um deploy ao vivo, explique que ele
+exige nova revisão de custo, permissões e autorização.
 
-Use somente capturas e resultados reais, sem IDs sensíveis, state, chaves ou planos
-salvos. Depois da execução aprovada, acrescente evidências e atualize esta narrativa.
+## Perguntas para treinar
+
+**Qual problema o projeto resolve?**
+
+Organiza a criação e remoção de infraestrutura em código versionado, com parâmetros,
+revisão por PR e validações repetíveis. Não entrega uma aplicação de negócio pronta.
+
+**Por que separar o bootstrap da aplicação?**
+
+O backend guarda o state usado para administrar o DEV. Ele precisa existir antes
+da inicialização remota e sobreviver até a remoção da aplicação e exportação do
+state final. As proteções prevent_destroy continuam no código versionado; a limpeza
+autorizada usou uma cópia isolada com essas proteções desativadas.
+
+**Owner não pode acessar tudo?**
+
+Na sessão, o usuário com Owner recebeu negação ao tentar acessar dados. Foram
+necessárias roles específicas: Storage Blob Data Contributor no container e
+Key Vault Secrets Officer no cofre. Elas foram temporárias e removidas no final.
+Isso demonstrou a separação entre administrar recursos e acessar seus dados.
+
+**Como comprovou o locking?**
+
+Observei o state leased/locked durante o apply. Também adquiri um lease em blob
+sintético e confirmei que uma escrita sem o lease falhou; após liberá-lo, a escrita
+funcionou. Não executei dois applies concorrentes, portanto não afirmo ter feito
+esse ensaio completo.
+
+**Testou recuperação de desastre?**
+
+Recuperei uma versão de blob sintético e fiz delete/undelete com comparação de
+hash. Isso comprova esses mecanismos de blobs, mas não um restore completo do
+state nem metas de RPO/RTO. Esse exercício continua pendente.
+
+**Como validou a rede sem VMs?**
+
+Conferi as regras dos NSGs e testei o firewall do Storage retirando temporariamente
+o IP autorizado. Após propagação, houve negação; restaurar a regra restabeleceu o
+acesso. Não testei tráfego entre subnets nem SSH.
+
+**Por que zero VMs e por que não manter tudo ligado?**
+
+O escopo inicial validava infraestrutura e acesso a serviços sem precisar de compute.
+Remover o laboratório reduziu exposição e consumo contínuo. Zero VMs não significa
+custo zero: Storage e operações também precisam ser considerados.
+
+**O orçamento impede cobrança?**
+
+Não. O orçamento mensal de R$ 50 gera alertas. Na sessão, o spending limit da
+assinatura estava On; é um controle separado. O inventário ficou vazio, mas o
+consumo já realizado pode aparecer depois. Não prometo custo final zero.
+
+**CI verde significa infraestrutura segura e funcionando?**
+
+Não. Mocks verificam comportamentos planejados sem Azure. O Checkov bloqueia um
+conjunto selecionado de verificações; outros findings estão documentados na triagem.
+Permissões, propagação e comportamento real exigiram testes na assinatura.
+
+**DEV e PROD estão isolados? OIDC está funcionando?**
+
+Há roots e chaves de state distintos no código. Só DEV foi executado; isolamento
+de permissões contra PROD ainda não foi comprovado. Existe um template inativo de
+plan manual com OIDC, mas não uma integração OIDC operacional.
+
+**Como usou IA no projeto?**
+
+“Usei o Codex como apoio para implementar, validar e documentar mudanças. Revisei
+as decisões e autorizei a execução Azure. Na apresentação, separo o que consigo
+explicar e demonstrar do que ainda preciso estudar ou validar.”
+
+Adapte essa resposta à sua participação real. Treine explicando uma PR, uma regra
+de rede e uma evidência sem depender de uma resposta pronta.
+
+## Critério de preparação para a entrevista
+
+Você está pronto para demonstrar esta etapa quando conseguir explicar o caminho
+DEV → módulos → recursos, a função do state, uma falha de permissão observada e
+como comprovou a limpeza. Termine com uma evolução concreta: validar OIDC com
+permissões mínimas e execução manual aprovada, antes de ampliar o escopo.
+
+Pendências operacionais: conferir o custo após atualização do faturamento e, em
+uma consulta autorizada após a data prevista, verificar a retenção do Key Vault.
+Este roteiro não agenda consultas nem autoriza novas operações Azure.

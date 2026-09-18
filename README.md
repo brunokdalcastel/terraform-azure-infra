@@ -4,16 +4,17 @@ Portfólio de Infrastructure as Code para Azure, com módulos Terraform e evolu�
 incremental por Pull Requests. O objetivo é demonstrar decisões de engenharia,
 validação reproduzível, segurança e controle de custos.
 
-**Status:** preparação e validação local. Provisionamento e testes reais no Azure
-ficam para a etapa final, após criação da conta e aprovação manual do proprietário.
-Merge de código não autoriza deploy.
+**Status:** backend e DEV sem VMs validados temporariamente no Azure em 18/09/2026,
+com limpeza após os testes. Veja as [evidências e limitações](docs/azure-validation-2026-09-18.md).
+PROD e OIDC continuam pendentes. Novas execuções exigem aprovação manual;
+merge de código não autoriza deploy.
 
 ## Implementado e planejado
 
 | Área | Implementado no código | Próxima evolução |
 | --- | --- | --- |
 | Estrutura | DEV/PROD com inputs e chaves de state próprias; cinco módulos | Validar ambientes reais e isolamento de permissões |
-| State | Bootstrap e backends AzureRM DEV/PROD preparados em código | Provisionar backend, migrar eventual state e validar locking |
+| State | Bootstrap e backend DEV testados com Entra ID e lock observado | Validar recuperação completa e isolamento de PROD |
 | CI | fmt, init sem backend, validate, testes com mocks e TFLint | Política de findings de segurança |
 | Segurança CI | Checkov bloqueia três regressões de Storage | Triagem dos demais findings |
 | Entrega | CI sem Azure; template inativo de plan OIDC manual | Configurar identidade/rede e validar execução aprovada |
@@ -24,8 +25,8 @@ Para mudanças e revisão de PRs, siga [CONTRIBUTING.md](CONTRIBUTING.md).
 Veja também os [registros de arquitetura (ADRs)](docs/adr/README.md) e o [lint Terraform](docs/tflint.md).
 
 O [bootstrap do backend](bootstrap/backend/README.md) é independente da aplicação.
-Seu código prepara o destino do state; nenhum Storage foi provisionado e o backend
-DEV está configurado para AzureRM, sem inicialização ou migração real.
+O Storage e a inicialização remota do DEV foram validados na sessão temporária;
+os recursos foram removidos ao final. PROD permanece sem execução real.
 Veja a [preparação do DEV](environments/dev/README.md). A inicialização real exige
 aprovação e revisão de rede e permissões.
 

@@ -8,10 +8,10 @@ funcionalidades planejadas como implementadas ou infraestrutura como testada sem
 ## Autorização atual
 
 - Implementação e validações locais/CI estão autorizadas.
-- O proprietário ainda vai criar a conta Azure para este projeto.
-- Não executar comandos contra Azure, autenticação Azure, plan com acesso Azure,
-  bootstrap, migração de state, apply, destroy, import ou alterações de permissões.
-- A execução Azure fica para a etapa final, após aprovação manual explícita do proprietário.
+- A conta Azure foi criada. A sessão autorizada de backend e DEV sem VMs em
+  18/09/2026 foi encerrada com limpeza; veja docs/azure-validation-2026-09-18.md.
+- Novas execuções contra Azure (incluindo plan remoto, apply, destroy, import e
+  alterações de permissões) exigem autorização explícita do proprietário.
 - Merge de código não autoriza deploy. Futuros workflows de deploy devem exigir
   acionamento manual e aprovação; não adicionar apply automático após merge.
 - Não commitar secrets, states, planos salvos ou arquivos com valores reais.

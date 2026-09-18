@@ -1,7 +1,8 @@
 # PROJECT_PLAN.md — Evolução Profissional do `terraform-azure-infra`
 
 > Atualização do proprietário: este projeto é um portfólio para entrevistas.
-> Toda execução Azure fica para o final, após criação da conta e aprovação manual.
+> A primeira sessão Azure aprovada foi encerrada com limpeza em 18/09/2026;
+> veja [evidências](docs/azure-validation-2026-09-18.md). Novas execuções exigem aprovação manual.
 > Esta regra prevalece sobre os exemplos abaixo de apply após merge.
 > Merge não autoriza deploy; o fluxo final deverá ser manual e aprovado.
 

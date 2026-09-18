@@ -1,8 +1,9 @@
 # Ponto de parada antes do Azure
 
 O código pode ser revisado sem assinatura. Este documento não autoriza execução.
-O proprietário ainda criará a assinatura; nenhuma identidade, role, rede real,
-backend remoto ou infraestrutura foi provisionada nesta preparação.
+Este roteiro registra a preparação original. A assinatura foi criada e uma sessão
+temporária de backend e DEV foi executada e encerrada em 18/09/2026: veja
+[resultados e limitações](azure-validation-2026-09-18.md). OIDC e PROD não foram executados.
 
 ## Preparado em código
 

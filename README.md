@@ -13,10 +13,10 @@ Merge de código não autoriza deploy.
 | Área | Implementado no código | Próxima evolução |
 | --- | --- | --- |
 | Estrutura | DEV/PROD com inputs e chaves de state próprias; cinco módulos | Validar ambientes reais e isolamento de permissões |
-| State | Bootstrap e backend AzureRM DEV preparados em código | Provisionar backend, migrar eventual state e validar locking |
+| State | Bootstrap e backends AzureRM DEV/PROD preparados em código | Provisionar backend, migrar eventual state e validar locking |
 | CI | fmt, init sem backend, validate, testes com mocks e TFLint | Política de findings de segurança |
 | Segurança CI | Checkov bloqueia três regressões de Storage | Triagem dos demais findings |
-| Entrega | CI sem autenticação/deploy Azure | OIDC e execução manual aprovada |
+| Entrega | CI sem Azure; template inativo de plan OIDC manual | Configurar identidade/rede e validar execução aprovada |
 | Governança | Prefixos validados, tags estáveis/protegidas e ADRs | Validação operacional |
 
 Veja [PROJECT_PLAN.md](PROJECT_PLAN.md) e as regras em [AGENTS.md](AGENTS.md).
@@ -28,6 +28,9 @@ Seu código prepara o destino do state; nenhum Storage foi provisionado e o back
 DEV está configurado para AzureRM, sem inicialização ou migração real.
 Veja a [preparação do DEV](environments/dev/README.md). A inicialização real exige
 aprovação e revisão de rede e permissões.
+
+Veja a [arquitetura](docs/architecture.md), o [roteiro de apresentação](docs/portfolio-presentation.md)
+e o [ponto de parada antes do Azure](docs/azure-readiness.md).
 
 ## Arquitetura atual do código
 

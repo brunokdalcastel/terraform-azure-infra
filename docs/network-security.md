@@ -15,7 +15,8 @@ NSG/subnet são preservados. Defaults de endereçamento dos ambientes não mudam
 A regra SSH fica desabilitada por padrão e exige hosts privados /32 explícitos.
 A conectividade administrativa ainda precisa ser preparada; veja [acesso às VMs](vm-access.md).
 As regras podem interromper conexões entre pares e fluxos não listados em um
-ambiente existente. Nenhuma alteração foi aplicada no Azure.
+ambiente existente. As regras foram provisionadas e consultadas na sessão DEV;
+não houve teste de tráfego entre VMs. Veja as [evidências](azure-validation-2026-09-18.md).
 
 Não há regra de health probe para Azure Load Balancer: esse serviço não está
 implementado e precisará de revisão própria se for adicionado. Permitir 443
@@ -29,4 +30,4 @@ tráfego ou estado de conexões no Azure. Validação real requer aprovação fi
 
 Referência: [NSGs e filtragem de tráfego](https://learn.microsoft.com/azure/virtual-network/network-security-group-how-it-works).
 
-HTTP 80 foi removido por não haver aplicação ou redirecionamento que o utilize. Uma futura reintrodução exige revisão. Em infraestrutura existente, a alteração interromperia novas conexões HTTP; nada foi aplicado.
+HTTP 80 foi removido por não haver aplicação ou redirecionamento que o utilize. Uma futura reintrodução exige revisão. Em infraestrutura existente, a alteração interromperia novas conexões HTTP; na sessão DEV, a configuração final foi provisionada.

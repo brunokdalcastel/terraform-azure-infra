@@ -1,7 +1,8 @@
 # Bootstrap do backend Terraform
 
-**Status: código e testes simulados. Não provisionado.** Nenhum state foi migrado.
-O DEV tem configuração AzureRM preparada, ainda sem inicialização ou migração real.
+**Status: bootstrap e backend DEV validados em sessão temporária e removidos.**
+A inicialização remota usou Entra ID, sem migração de state existente.
+Veja os [resultados e limites](../../docs/azure-validation-2026-09-18.md).
 
 ## Decisão e escopo
 
@@ -11,7 +12,7 @@ Não reutiliza o módulo de Storage da aplicação, pois state exige regras pró
 de acesso, recuperação e proteção contra exclusão.
 
 Usa Microsoft Entra ID (`storage_use_azuread` no provider), com Shared Key
-desabilitada. O futuro backend usará `use_azuread_auth`: autenticação do provider
+desabilitada. O backend DEV usa `use_azuread_auth`: autenticação do provider
 e autenticação do backend são configurações distintas.
 Os outputs contêm somente coordenadas e ID; não exportam chaves ou tokens.
 O state do bootstrap ainda deve ser tratado como sensível, mesmo sem esses outputs.
@@ -49,7 +50,7 @@ de gerenciamento garante acesso aos blobs. O futuro leitor/escritor do state
 precisará de Storage Blob Data Contributor no menor escopo adequado, preferindo
 container quando disponível. Criar/atribuir roles não faz parte desta PR.
 
-Como a conta/container ainda não existem, revisar previamente com o proprietário
+Como os recursos da sessão foram removidos, revisar previamente com o proprietário
 como conceder os acessos iniciais e considerar o tempo de propagação do RBAC.
 A conta Azure, registro de Microsoft.Storage e nome globalmente disponível também
 precisam ser confirmados. O provider não registra namespaces automaticamente.
@@ -79,7 +80,7 @@ isolamento de permissões. A decisão de containers/contas por ambiente será re
 quando PROD e OIDC forem preparados.
 
 O [backend DEV](../../environments/dev/README.md) é preparado separadamente.
-Nenhuma migração foi executada; a validação real só ocorrerá ao final, com aprovação.
+Nenhuma migração foi executada. Novas sessões reais exigem revisão e aprovação.
 
 ## Referências
 

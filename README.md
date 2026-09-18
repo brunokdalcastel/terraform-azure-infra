@@ -35,15 +35,45 @@ e o [ponto de parada antes do Azure](docs/azure-readiness.md).
 
 ## Arquitetura atual do código
 
-```text
-environments/dev
-└── modules/app-infrastructure
-    ├── Resource Group
-    ├── network  → VNet, subnets Web/App/Data e NSGs
-    ├── security → Key Vault; depende da rede
-    ├── storage  → Storage Account e containers data/logs/backups
-    └── compute  → NICs e VMs na subnet App; depende da rede
+O diagrama representa a infraestrutura reproduzível do laboratório. Backend e DEV
+sem VMs foram testados e removidos; não há ambiente mantido ativo.
+
+```mermaid
+flowchart TB
+  Repo["GitHub · código e Pull Requests"] --> CI["CI · validate, mocks, TFLint e Checkov"]
+  Operator["Operador · execução manual autorizada"] --> TF["Terraform · Azure CLI / Entra ID"]
+
+  subgraph Azure["Azure · sessão temporária em Brazil South"]
+    subgraph Backend["Resource Group · backend independente"]
+      State["Storage de state · container tfstate<br/>Entra ID · versionamento · lease"]
+    end
+    subgraph Dev["Resource Group · DEV"]
+      subgraph VNet["Virtual Network"]
+        Web["Subnet Web<br/>NSG · HTTPS 443"]
+        App["Subnet App<br/>NSG · 8080/8443 da Web"]
+        Data["Subnet Data<br/>NSG · portas de banco da App"]
+        VM["Compute opcional na App<br/>NIC privada + VM · zero no teste"]
+        App -. "localização" .-> VM
+      end
+      Storage["Storage da aplicação<br/>containers data / logs / backups"]
+      KV["Key Vault<br/>RBAC"]
+    end
+  end
+
+  TF -->|"state remoto do DEV"| State
+  TF -->|"provisionamento"| Dev
+  TF -->|"bootstrap separado"| Backend
+  classDef tested fill:#e6f4ea,stroke:#287744,color:#143c23;
+  classDef optional fill:#fff4db,stroke:#946200,color:#533800,stroke-dasharray:5 5;
+  class State,Web,App,Data,Storage,KV tested;
+  class VM optional;
 ```
+
+**Verde:** componentes validados na sessão, com os limites descritos nas
+[evidências](docs/azure-validation-2026-09-18.md). **Tracejado:** compute disponível
+no código, não provisionado. As setas indicam gestão ou localização, não tráfego
+testado entre subnets. Storage e Key Vault usam firewall Deny; não há Private Endpoints.
+O CI não faz deploy. PROD e OIDC continuam como evoluções pendentes.
 
 As VMs usam Ubuntu 22.04 e um script que instala Docker. Não há IP público,
 aplicação Web, banco de dados, balanceador ou Bastion. Os containers são destinos

@@ -1,7 +1,9 @@
 # Arquitetura e fluxo de entrega
 
-O diagrama descreve configuração e dependências. Azure não foi provisionado;
-as setas de OIDC e backend representam a etapa futura aprovada.
+O diagrama descreve configuração e dependências. Backend e DEV sem VMs foram
+validados em sessão temporária e removidos; veja as
+[evidências](azure-validation-2026-09-18.md) e a [visão gráfica no README](../README.md#arquitetura-atual-do-código).
+As setas de OIDC representam uma evolução ainda não executada.
 
 ```mermaid
 flowchart TD
@@ -19,7 +21,7 @@ flowchart TD
   VM --> Network
   Storage -. auditoria opcional .-> Logs[Log Analytics existente e aprovado]
   Bootstrap[Bootstrap independente] --> State[Storage tfstate / chaves DEV e PROD]
-  Roots -. backend preparado .-> State
+  Roots -. DEV validado / PROD pendente .-> State
   State -. auditoria opcional .-> Logs
 ```
 
